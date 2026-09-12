@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "id": "io.github.alxwolfenstein97.omaobs",
+  "name": "OmaOBS",
+  "version": "1.0.0",
+  "author": "AlxWolfenstein97",
+  "license": "MIT",
+  "description": "Style menu picker with OBS window mockups for every Omarchy theme. Generates a Yami variant OBS can load and applies it after you pick one.",
+  "homepage": "https://github.com/AlxWolfenstein97/omaobs",
+  "repository": "https://github.com/AlxWolfenstein97/omaobs",
+  "kinds": [
+    "service"
+  ],
+  "keepLoaded": true,
+  "entryPoints": {
+    "service": "Service.qml"
+  }
+}

@@ -1,0 +1,10 @@
+#!/bin/bash
+# omaobs theme-set hook — keep OBS in step with the desktop theme.
+set -uo pipefail
+
+PLUGIN="${OMAOBS_PLUGIN_DIR:-$HOME/.config/omarchy/plugins/io.github.alxwolfenstein97.omaobs}"
+SYNC="$PLUGIN/bin/omaobs-sync"
+
+[[ -x $SYNC ]] || exit 0
+"$SYNC" --quiet >/dev/null 2>&1 || true
+exit 0

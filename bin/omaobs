@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+# Thin launcher so menu actions and hooks can call omaobs-* by name.
+set -euo pipefail
+here="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+export OMAOBS_PLUGIN_DIR="${OMAOBS_PLUGIN_DIR:-$(cd "$here/.." && pwd)}"
+exec python3 "$OMAOBS_PLUGIN_DIR/lib/omaobs.py" "$@"
