@@ -99,8 +99,10 @@ bash ~/.config/omarchy/plugins/io.github.alxwolfenstein97.omaobs/check.sh
 
 ## Credits
 
-- Live screenshot captured with [omcp](https://github.com/tsouth89/omcp)
-  (Omarchy MCP) on the official **Hackerman** theme.
+- Live screenshot captured with
+  [OMCP](https://github.com/btsouth/omarchy-omcp) (Omarchy MCP desktop bridge —
+  themes, windows, screenshots, …) on the official **Hackerman** theme.
+  `omarchy plugin add https://github.com/btsouth/omarchy-omcp --enable`
 - Mockup strip: [preview-mockup.png](preview-mockup.png).
 - [Omarchy](https://omarchy.org/) — theme pipeline, Style menu image picker, and
   `theme-set` hooks this plugin hooks into.
