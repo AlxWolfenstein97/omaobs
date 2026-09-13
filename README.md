@@ -16,6 +16,24 @@ lockstep forever after.
 > Illustrative mockup of the same pipeline (Hackerman): see
 > [preview-mockup.png](preview-mockup.png).
 
+## Goals (and honest limits)
+
+These Style plugins extend Omarchy’s theme system **without requiring theme
+authors — or you — to ship anything extra**. Official themes, your forks, and
+third-party installs all work as long as they have a `colors.toml`.
+
+| Goal | What that means here |
+|------|----------------------|
+| Zero extra assets | No per-theme OBS screenshots. Colours come from `colors.toml` alone. |
+| Extreme compatibility | Stock + user + foreign themes all appear in the picker automatically. |
+| Illustrative mockups | Centered OBS-ish chrome. **Not** a live OBS window capture and **not** WYSIWYG. |
+| Carousel-safe | Mockups match the Style tile aspect (~768×475) so edge text is not cropped. |
+| Slow pickers are OK | Warming every theme PNG takes a moment; that is the cost of generating previews instead of bundling assets. |
+
+True WYSIWYG would mean launching OBS and grim’ing it per theme — slow,
+fragile, and out of scope. The applied `Omarchy.ovt` *is* real; only the
+picker art is drawn.
+
 ## What you get
 
 - **Style → OBS Themes** in the Omarchy menu — same carousel picker as Unlock /
@@ -89,7 +107,6 @@ OmaOBS state/cache. Scene collections are untouched.
   first time needs one OBS restart (or pick Omarchy under Settings → Appearance).
 - Individual stock OBS variants (Acri, Rachni, …) are left alone; OmaOBS owns
   only `Omarchy.ovt`.
-- Mockups are illustrative, not pixel-perfect OBS chrome.
 
 ## Check
 
@@ -104,6 +121,9 @@ bash ~/.config/omarchy/plugins/io.github.alxwolfenstein97.omaobs/check.sh
   themes, windows, screenshots, …) on the official **Hackerman** theme.
   `omarchy plugin add https://github.com/btsouth/omarchy-omcp --enable`
 - Mockup strip: [preview-mockup.png](preview-mockup.png).
+- Sibling Style plugins: [OmaBoot](https://github.com/AlxWolfenstein97/omaboot),
+  [OmaVT](https://github.com/AlxWolfenstein97/omavt),
+  [OmaTTY](https://github.com/AlxWolfenstein97/omatty).
 - [Omarchy](https://omarchy.org/) — theme pipeline, Style menu image picker, and
   `theme-set` hooks this plugin hooks into.
 
