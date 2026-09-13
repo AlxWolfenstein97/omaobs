@@ -27,7 +27,7 @@ third-party installs all work as long as they have a `colors.toml`.
 | Zero extra assets | No per-theme OBS screenshots. Colours come from `colors.toml` alone. |
 | Extreme compatibility | Stock + user + foreign themes all appear in the picker automatically. |
 | Illustrative mockups | Centered OBS-ish chrome. **Not** a live OBS window capture and **not** WYSIWYG. |
-| Carousel-safe | Mockups match the Style tile aspect (~768×475) so edge text is not cropped. |
+| Carousel-safe | Mockups are 1536×864 (menu-images thumbnail size) with ~8% side inset so the 768×475 tile crop does not shave the subject. |
 | Slow pickers are OK | Warming every theme PNG takes a moment; that is the cost of generating previews instead of bundling assets. |
 
 True WYSIWYG would mean launching OBS and grim’ing it per theme — slow,

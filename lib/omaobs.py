@@ -693,38 +693,40 @@ def draw_round_rect(
     draw.rounded_rectangle(box, radius=radius, fill=fill, outline=outline, width=width)
 
 
-# Style carousel selected tile is 768×475 (~1.62). Match that aspect so
-# PreserveAspectCrop does not shave left/right the way 16:9 sources do.
-MOCKUP_SIZE = (1536, 950)
+# omarchy-menu-images thumbnails every source to 1536×864 (16:9) with
+# smartcrop BEFORE the Style carousel shows it in a 768×475 tile. Matching
+# that size avoids a second crop; keep content inside ~8% side margins so
+# PreserveAspectCrop on the tile does not shave the subject.
+MOCKUP_SIZE = (1536, 864)
+SAFE_X = 120
 
 
 def render_mockup(palette: dict[str, Any], dest: Path, size: tuple[int, int] = MOCKUP_SIZE) -> Path:
-    """Simplified OBS chrome, centered for the Style carousel safe zone."""
+    """Simplified OBS chrome, centered inside the Style carousel safe zone."""
     w, h = size
     img = Image.new("RGB", size, hex_to_rgb(palette["grey8"]))
     draw = ImageDraw.Draw(img)
 
-    font_sm = try_font(20)
-    font_md = try_font(26)
-    font_lg = try_font(34)
+    font_sm = try_font(18)
+    font_md = try_font(24)
+    font_lg = try_font(30)
 
-    # Window inset — keep docks/preview inside the tile, not at the bleed.
-    margin_x, margin_y = 90, 55
+    margin_x, margin_y = SAFE_X, 48
     win = (margin_x, margin_y, w - margin_x, h - margin_y)
-    draw_round_rect(draw, win, palette["grey7"], radius=16, outline=palette["grey5"], width=2)
+    draw_round_rect(draw, win, palette["grey7"], radius=14, outline=palette["grey5"], width=2)
 
-    title_bottom = margin_y + 52
+    title_bottom = margin_y + 46
     draw.rectangle(
         (margin_x + 2, margin_y + 2, w - margin_x - 2, title_bottom),
         fill=hex_to_rgb(palette["grey7"]),
     )
-    draw.text((margin_x + 24, margin_y + 14), "OBS Studio", font=font_md, fill=hex_to_rgb(palette["text"]))
+    draw.text((margin_x + 20, margin_y + 12), "OBS Studio", font=font_md, fill=hex_to_rgb(palette["text"]))
     draw.rectangle(
         (margin_x + 2, title_bottom - 3, w - margin_x - 2, title_bottom),
         fill=hex_to_rgb(palette["primary"]),
     )
 
-    toolbar_bottom = title_bottom + 48
+    toolbar_bottom = title_bottom + 44
     draw.rectangle(
         (margin_x + 2, title_bottom, w - margin_x - 2, toolbar_bottom),
         fill=hex_to_rgb(palette["grey7"]),
@@ -734,112 +736,112 @@ def render_mockup(palette: dict[str, Any], dest: Path, size: tuple[int, int] = M
         ("Start Recording", palette["primary"], palette["on_accent"]),
         ("Studio Mode", palette["grey5"], palette["text"]),
     ]
-    bx = margin_x + 24
+    bx = margin_x + 20
     for label, fill, fg in buttons:
         tw = draw.textlength(label, font=font_sm)
         draw_round_rect(
-            draw, (bx, title_bottom + 8, int(bx + tw + 32), toolbar_bottom - 8), fill, radius=8
+            draw, (bx, title_bottom + 8, int(bx + tw + 28), toolbar_bottom - 8), fill, radius=8
         )
-        draw.text((bx + 16, title_bottom + 14), label, font=font_sm, fill=hex_to_rgb(fg))
-        bx += int(tw + 48)
+        draw.text((bx + 14, title_bottom + 12), label, font=font_sm, fill=hex_to_rgb(fg))
+        bx += int(tw + 42)
 
     content_top = toolbar_bottom + 10
-    content_bottom = h - margin_y - 120
-    left_w = 220
-    right_w = 240
+    content_bottom = h - margin_y - 100
+    left_w = 200
+    right_w = 210
 
-    left = (margin_x + 14, content_top, margin_x + 14 + left_w, content_bottom)
-    right = (w - margin_x - 14 - right_w, content_top, w - margin_x - 14, content_bottom)
-    center = (left[2] + 12, content_top, right[0] - 12, content_bottom)
+    left = (margin_x + 12, content_top, margin_x + 12 + left_w, content_bottom)
+    right = (w - margin_x - 12 - right_w, content_top, w - margin_x - 12, content_bottom)
+    center = (left[2] + 10, content_top, right[0] - 10, content_bottom)
 
     draw_round_rect(draw, left, palette["grey6"], radius=10)
     draw_round_rect(draw, right, palette["grey6"], radius=10)
     draw_round_rect(draw, center, palette["grey8"], radius=10, outline=palette["primary"], width=3)
 
-    draw.text((left[0] + 14, left[1] + 12), "Scenes", font=font_md, fill=hex_to_rgb(palette["text"]))
+    draw.text((left[0] + 12, left[1] + 10), "Scenes", font=font_md, fill=hex_to_rgb(palette["text"]))
     scenes = [("Main", True), ("BRB", False), ("Starting", False)]
-    sy = left[1] + 52
+    sy = left[1] + 46
     for label, selected in scenes:
-        box = (left[0] + 10, sy, left[2] - 10, sy + 42)
+        box = (left[0] + 8, sy, left[2] - 8, sy + 38)
         fill = palette["selected_bg"] if selected else palette["grey5"]
         ink = palette["on_selected"] if selected else palette["text"]
         draw_round_rect(draw, box, fill, radius=8)
-        draw.text((box[0] + 14, box[1] + 10), label, font=font_sm, fill=hex_to_rgb(ink))
+        draw.text((box[0] + 12, box[1] + 8), label, font=font_sm, fill=hex_to_rgb(ink))
         if selected:
             draw.rectangle(
                 (box[0], box[1] + 6, box[0] + 4, box[3] - 6),
                 fill=hex_to_rgb(palette["primary_lighter"]),
             )
-        sy += 52
+        sy += 46
 
-    draw.text((right[0] + 14, right[1] + 12), "Sources", font=font_md, fill=hex_to_rgb(palette["text"]))
+    draw.text((right[0] + 12, right[1] + 10), "Sources", font=font_md, fill=hex_to_rgb(palette["text"]))
     sources = [("Display", True), ("Game", False), ("Mic/Aux", False)]
-    sy = right[1] + 52
+    sy = right[1] + 46
     for label, selected in sources:
-        box = (right[0] + 10, sy, right[2] - 10, sy + 42)
+        box = (right[0] + 8, sy, right[2] - 8, sy + 38)
         fill = palette["selected_bg"] if selected else palette["grey5"]
         ink = palette["on_selected"] if selected else palette["text"]
         draw_round_rect(draw, box, fill, radius=8)
         draw.ellipse(
-            (box[0] + 12, box[1] + 14, box[0] + 26, box[1] + 28),
+            (box[0] + 10, box[1] + 12, box[0] + 22, box[1] + 24),
             fill=hex_to_rgb(palette["primary"] if selected else palette["muted"]),
         )
-        draw.text((box[0] + 34, box[1] + 10), label, font=font_sm, fill=hex_to_rgb(ink))
-        sy += 52
+        draw.text((box[0] + 30, box[1] + 8), label, font=font_sm, fill=hex_to_rgb(ink))
+        sy += 46
 
-    preview_inset = (center[0] + 18, center[1] + 18, center[2] - 18, center[3] - 18)
+    preview_inset = (center[0] + 14, center[1] + 14, center[2] - 14, center[3] - 14)
     draw_round_rect(draw, preview_inset, palette["darker_background"], radius=8)
     cam = (
-        preview_inset[0] + 28,
-        preview_inset[1] + 28,
-        preview_inset[0] + 300,
-        preview_inset[1] + 200,
+        preview_inset[0] + 20,
+        preview_inset[1] + 20,
+        preview_inset[0] + 260,
+        preview_inset[1] + 160,
     )
     draw_round_rect(draw, cam, palette["primary_darker"], radius=10, outline=palette["primary"], width=3)
-    draw.text((cam[0] + 18, cam[1] + 18), "Camera", font=font_sm, fill=hex_to_rgb(palette["primary_lighter"]))
+    draw.text((cam[0] + 14, cam[1] + 14), "Camera", font=font_sm, fill=hex_to_rgb(palette["primary_lighter"]))
 
     badge = "ACCENT"
     bw = draw.textlength(badge, font=font_lg)
     badge_box = (
-        int((preview_inset[0] + preview_inset[2] - bw) / 2 - 22),
-        int((preview_inset[1] + preview_inset[3]) / 2 - 28),
-        int((preview_inset[0] + preview_inset[2] + bw) / 2 + 22),
-        int((preview_inset[1] + preview_inset[3]) / 2 + 28),
+        int((preview_inset[0] + preview_inset[2] - bw) / 2 - 18),
+        int((preview_inset[1] + preview_inset[3]) / 2 - 22),
+        int((preview_inset[0] + preview_inset[2] + bw) / 2 + 18),
+        int((preview_inset[1] + preview_inset[3]) / 2 + 22),
     )
-    draw_round_rect(draw, badge_box, palette["primary"], radius=12)
+    draw_round_rect(draw, badge_box, palette["primary"], radius=10)
     draw.text(
-        (badge_box[0] + 22, badge_box[1] + 12),
+        (badge_box[0] + 18, badge_box[1] + 8),
         badge,
         font=font_lg,
         fill=hex_to_rgb(palette["on_accent"]),
     )
 
-    mixer_top = content_bottom + 12
-    mixer = (margin_x + 14, mixer_top, w - margin_x - 14, h - margin_y - 14)
+    mixer_top = content_bottom + 10
+    mixer = (margin_x + 12, mixer_top, w - margin_x - 12, h - margin_y - 12)
     draw_round_rect(draw, mixer, palette["grey6"], radius=10)
-    draw.text((mixer[0] + 16, mixer[1] + 12), "Audio Mixer", font=font_md, fill=hex_to_rgb(palette["text"]))
+    draw.text((mixer[0] + 14, mixer[1] + 10), "Audio Mixer", font=font_md, fill=hex_to_rgb(palette["text"]))
 
     meters = [
         ("Desktop", palette["green"], 0.82),
         ("Mic/Aux", palette["primary"], 0.55),
         ("Music", palette["yellow"], 0.35),
     ]
-    mx = mixer[0] + 28
-    meter_bottom = mixer[3] - 18
-    meter_top = mixer[1] + 48
-    meter_w = max(160, (mixer[2] - mixer[0] - 80) // len(meters) - 24)
+    mx = mixer[0] + 24
+    meter_bottom = mixer[3] - 14
+    meter_top = mixer[1] + 42
+    meter_w = max(140, (mixer[2] - mixer[0] - 70) // len(meters) - 20)
     for label, color, level in meters:
         draw.text((mx, meter_top - 4), label, font=font_sm, fill=hex_to_rgb(palette["text_muted"]))
-        bar = (mx, meter_top + 22, mx + meter_w, meter_bottom)
+        bar = (mx, meter_top + 18, mx + meter_w, meter_bottom)
         draw_round_rect(draw, bar, palette["grey8"], radius=6)
-        height = max(12, int((bar[3] - bar[1] - 6) * level))
+        height = max(10, int((bar[3] - bar[1] - 6) * level))
         filled_top = bar[3] - 3 - height
         draw.rectangle((bar[0] + 3, filled_top, bar[2] - 3, bar[3] - 3), fill=hex_to_rgb(color))
         draw.rectangle(
-            (bar[0] + 3, filled_top, bar[2] - 3, filled_top + 5),
+            (bar[0] + 3, filled_top, bar[2] - 3, filled_top + 4),
             fill=hex_to_rgb(palette["primary_lighter"]),
         )
-        mx += meter_w + 28
+        mx += meter_w + 24
 
     dest.parent.mkdir(parents=True, exist_ok=True)
     img.save(dest, format="PNG", optimize=True)
@@ -855,6 +857,60 @@ def generate_preview(slug: str) -> Path:
     return render_mockup(palette, preview_path(slug))
 
 
+def bust_image_picker_cache(preview_root: Path) -> None:
+    """Invalidate omarchy-menu-images rows/thumbnails for our preview dir."""
+    try:
+        os.utime(preview_root, None)
+    except OSError:
+        pass
+
+    cache_dir = Path(
+        os.environ.get(
+            "OMAOBS_IMAGE_SELECTOR_CACHE",
+            home() / ".cache/omarchy/image-selector",
+        )
+    )
+    if not cache_dir.is_dir():
+        return
+
+    needle = str(preview_root.resolve())
+    for path in cache_dir.iterdir():
+        name = path.name
+        if not (
+            name.endswith(".rows")
+            or name.endswith(".signature")
+            or name.endswith(".fast-signature")
+            or name.endswith(".rows.lock")
+        ):
+            continue
+        try:
+            text = path.read_text(encoding="utf-8", errors="ignore")
+        except OSError:
+            continue
+        if needle in text or str(preview_root) in text:
+            path.unlink(missing_ok=True)
+
+    index = cache_dir / "index.tsv"
+    if index.is_file():
+        try:
+            lines = index.read_text(encoding="utf-8", errors="ignore").splitlines()
+        except OSError:
+            lines = []
+        kept: list[str] = []
+        for line in lines:
+            parts = line.split("\t")
+            if parts and (needle in parts[0] or str(preview_root) in parts[0]):
+                if len(parts) >= 3:
+                    (cache_dir / f"{parts[2]}.jpg").unlink(missing_ok=True)
+                    (cache_dir / f"{parts[2]}.jpg.lock").unlink(missing_ok=True)
+                continue
+            kept.append(line)
+        try:
+            atomic_write(index, ("\n".join(kept) + ("\n" if kept else "")))
+        except OSError:
+            pass
+
+
 def generate_all_previews() -> list[Path]:
     out: list[Path] = []
     preview_root = paths()["cache"] / "previews"
@@ -866,6 +922,7 @@ def generate_all_previews() -> list[Path]:
             existing.unlink(missing_ok=True)
     for slug in sorted(wanted):
         out.append(generate_preview(slug))
+    bust_image_picker_cache(preview_root)
     return out
 
 
