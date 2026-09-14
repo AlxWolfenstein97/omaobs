@@ -34,6 +34,14 @@ True WYSIWYG would mean launching OBS and grim’ing it per theme — slow,
 fragile, and out of scope. The applied `Omarchy.ovt` *is* real; only the
 picker art is drawn.
 
+### Why a picker if `theme-set` already syncs?
+
+Chroma can stay silent — it rewrites toolkit CSS for the whole desktop. OBS is
+one specific surface with a real theme format. The Style carousel is still
+worth it: you can skim how OBS would look across **every** installed theme
+faster than applying and eyeballing each one by hand. Pick once (or never —
+the hook keeps pace after that). Same idea as OmaCursor / OmaBoot / OmaVT.
+
 ## What you get
 
 - **Style → OBS Themes** in the Omarchy menu — same carousel picker as Unlock /
