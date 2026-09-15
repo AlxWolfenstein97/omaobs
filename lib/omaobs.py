@@ -695,153 +695,156 @@ def draw_round_rect(
 
 # omarchy-menu-images thumbnails every source to 1536×864 (16:9) with
 # smartcrop BEFORE the Style carousel shows it in a 768×475 tile. Matching
-# that size avoids a second crop; keep content inside ~8% side margins so
-# PreserveAspectCrop on the tile does not shave the subject.
+# omarchy-menu-images serves 1536×864 then crops to a 768×475 tile
+# (PreserveAspectCrop — shaves the sides). Keep the OBS chrome inside ~8%.
 MOCKUP_SIZE = (1536, 864)
 SAFE_X = 120
+SAFE_Y = 48
 
 
 def render_mockup(palette: dict[str, Any], dest: Path, size: tuple[int, int] = MOCKUP_SIZE) -> Path:
-    """Simplified OBS chrome, centered inside the Style carousel safe zone."""
+    """OBS Studio chrome from a real Asphalt/OmaOBS window capture.
+
+    Dock layout matches current OBS (Scenes+Sources left, preview center,
+    mixer + transitions + controls along the bottom). Colours from
+    colors.toml via the Yami grey/primary roles. Not a live grim per theme —
+    Limine/TTY-style True Theme Vibe. Content stays inside SAFE_X.
+    """
     w, h = size
     img = Image.new("RGB", size, hex_to_rgb(palette["grey8"]))
     draw = ImageDraw.Draw(img)
 
-    font_sm = try_font(18)
-    font_md = try_font(24)
-    font_lg = try_font(30)
+    font_sm = try_font(16)
+    font_md = try_font(20)
+    font_btn = try_font(18)
 
-    margin_x, margin_y = SAFE_X, 48
-    win = (margin_x, margin_y, w - margin_x, h - margin_y)
-    draw_round_rect(draw, win, palette["grey7"], radius=14, outline=palette["grey5"], width=2)
+    # Outer window — flat, no fake rounded OS chrome (OBS is a normal client).
+    win = (SAFE_X, SAFE_Y, w - SAFE_X, h - SAFE_Y)
+    draw.rectangle(win, fill=hex_to_rgb(palette["grey7"]))
 
-    title_bottom = margin_y + 46
-    draw.rectangle(
-        (margin_x + 2, margin_y + 2, w - margin_x - 2, title_bottom),
-        fill=hex_to_rgb(palette["grey7"]),
-    )
-    draw.text((margin_x + 20, margin_y + 12), "OBS Studio", font=font_md, fill=hex_to_rgb(palette["text"]))
-    draw.rectangle(
-        (margin_x + 2, title_bottom - 3, w - margin_x - 2, title_bottom),
-        fill=hex_to_rgb(palette["primary"]),
-    )
+    x0, y0, x1, y1 = win
+    # Menu bar
+    menu_h = 28
+    draw.rectangle((x0, y0, x1, y0 + menu_h), fill=hex_to_rgb(palette["grey7"]))
+    menu = "File   Edit   View   Docks   Profile   Scene Collection   Tools   Help"
+    draw.text((x0 + 12, y0 + 6), menu, font=font_sm, fill=hex_to_rgb(palette["text"]))
 
-    toolbar_bottom = title_bottom + 44
-    draw.rectangle(
-        (margin_x + 2, title_bottom, w - margin_x - 2, toolbar_bottom),
-        fill=hex_to_rgb(palette["grey7"]),
-    )
-    buttons = [
-        ("Start Streaming", palette["button_bg_red"], palette["on_red"]),
-        ("Start Recording", palette["primary"], palette["on_accent"]),
-        ("Studio Mode", palette["grey5"], palette["text"]),
-    ]
-    bx = margin_x + 20
-    for label, fill, fg in buttons:
-        tw = draw.textlength(label, font=font_sm)
-        draw_round_rect(
-            draw, (bx, title_bottom + 8, int(bx + tw + 28), toolbar_bottom - 8), fill, radius=8
-        )
-        draw.text((bx + 14, title_bottom + 12), label, font=font_sm, fill=hex_to_rgb(fg))
-        bx += int(tw + 42)
+    body_top = y0 + menu_h
+    status_h = 26
+    bottom_h = 200  # mixer + transitions + controls row
+    body_bottom = y1 - status_h - bottom_h
 
-    content_top = toolbar_bottom + 10
-    content_bottom = h - margin_y - 100
-    left_w = 200
-    right_w = 210
+    left_w = 220
+    # Left column: Scenes (top) + Sources (bottom)
+    mid_y = body_top + int((body_bottom - body_top) * 0.42)
+    scenes = (x0 + 4, body_top + 4, x0 + 4 + left_w, mid_y - 2)
+    sources = (x0 + 4, mid_y + 2, x0 + 4 + left_w, body_bottom - 4)
+    preview = (scenes[2] + 6, body_top + 4, x1 - 4, body_bottom - 4)
 
-    left = (margin_x + 12, content_top, margin_x + 12 + left_w, content_bottom)
-    right = (w - margin_x - 12 - right_w, content_top, w - margin_x - 12, content_bottom)
-    center = (left[2] + 10, content_top, right[0] - 10, content_bottom)
+    draw.rectangle(scenes, fill=hex_to_rgb(palette["grey6"]))
+    draw.rectangle(sources, fill=hex_to_rgb(palette["grey6"]))
+    draw.rectangle(preview, fill=hex_to_rgb(palette["grey8"]))
 
-    draw_round_rect(draw, left, palette["grey6"], radius=10)
-    draw_round_rect(draw, right, palette["grey6"], radius=10)
-    draw_round_rect(draw, center, palette["grey8"], radius=10, outline=palette["primary"], width=3)
+    # Scenes header + selected row (accent fill like real OBS)
+    draw.text((scenes[0] + 10, scenes[1] + 8), "Scenes", font=font_md, fill=hex_to_rgb(palette["text"]))
+    sel = (scenes[0] + 6, scenes[1] + 36, scenes[2] - 6, scenes[1] + 64)
+    draw.rectangle(sel, fill=hex_to_rgb(palette["selected_bg"]))
+    draw.text((sel[0] + 10, sel[1] + 6), "Scene", font=font_sm, fill=hex_to_rgb(palette["on_selected"]))
 
-    draw.text((left[0] + 12, left[1] + 10), "Scenes", font=font_md, fill=hex_to_rgb(palette["text"]))
-    scenes = [("Main", True), ("BRB", False), ("Starting", False)]
-    sy = left[1] + 46
-    for label, selected in scenes:
-        box = (left[0] + 8, sy, left[2] - 8, sy + 38)
-        fill = palette["selected_bg"] if selected else palette["grey5"]
-        ink = palette["on_selected"] if selected else palette["text"]
-        draw_round_rect(draw, box, fill, radius=8)
-        draw.text((box[0] + 12, box[1] + 8), label, font=font_sm, fill=hex_to_rgb(ink))
-        if selected:
-            draw.rectangle(
-                (box[0], box[1] + 6, box[0] + 4, box[3] - 6),
-                fill=hex_to_rgb(palette["primary_lighter"]),
-            )
-        sy += 46
+    # Sources — Media / Game / Chat (no Display Capture, matching the capture)
+    draw.text((sources[0] + 10, sources[1] + 8), "Sources", font=font_md, fill=hex_to_rgb(palette["text"]))
+    src_rows = ["Media", "Game", "Chat"]
+    sy = sources[1] + 36
+    for index, label in enumerate(src_rows):
+        row = (sources[0] + 6, sy, sources[2] - 6, sy + 28)
+        if index == 1:
+            draw.rectangle(row, fill=hex_to_rgb(palette["selected_bg"]))
+            ink = palette["on_selected"]
+        else:
+            ink = palette["text"]
+        draw.text((row[0] + 10, row[1] + 5), label, font=font_sm, fill=hex_to_rgb(ink))
+        sy += 32
 
-    draw.text((right[0] + 12, right[1] + 10), "Sources", font=font_md, fill=hex_to_rgb(palette["text"]))
-    sources = [("Display", True), ("Game", False), ("Mic/Aux", False)]
-    sy = right[1] + 46
-    for label, selected in sources:
-        box = (right[0] + 8, sy, right[2] - 8, sy + 38)
-        fill = palette["selected_bg"] if selected else palette["grey5"]
-        ink = palette["on_selected"] if selected else palette["text"]
-        draw_round_rect(draw, box, fill, radius=8)
-        draw.ellipse(
-            (box[0] + 10, box[1] + 12, box[0] + 22, box[1] + 24),
-            fill=hex_to_rgb(palette["primary"] if selected else palette["muted"]),
-        )
-        draw.text((box[0] + 30, box[1] + 8), label, font=font_sm, fill=hex_to_rgb(ink))
-        sy += 46
-
-    preview_inset = (center[0] + 14, center[1] + 14, center[2] - 14, center[3] - 14)
-    draw_round_rect(draw, preview_inset, palette["darker_background"], radius=8)
-    cam = (
-        preview_inset[0] + 20,
-        preview_inset[1] + 20,
-        preview_inset[0] + 260,
-        preview_inset[1] + 160,
-    )
-    draw_round_rect(draw, cam, palette["primary_darker"], radius=10, outline=palette["primary"], width=3)
-    draw.text((cam[0] + 14, cam[1] + 14), "Camera", font=font_sm, fill=hex_to_rgb(palette["primary_lighter"]))
-
-    badge = "ACCENT"
-    bw = draw.textlength(badge, font=font_lg)
-    badge_box = (
-        int((preview_inset[0] + preview_inset[2] - bw) / 2 - 18),
-        int((preview_inset[1] + preview_inset[3]) / 2 - 22),
-        int((preview_inset[0] + preview_inset[2] + bw) / 2 + 18),
-        int((preview_inset[1] + preview_inset[3]) / 2 + 22),
-    )
-    draw_round_rect(draw, badge_box, palette["primary"], radius=10)
+    # Preview canvas — empty black (no display capture)
+    pad = 10
+    canvas = (preview[0] + pad, preview[1] + pad, preview[2] - pad, preview[3] - 52)
+    draw.rectangle(canvas, fill=hex_to_rgb(palette["darker_background"]))
     draw.text(
-        (badge_box[0] + 18, badge_box[1] + 8),
-        badge,
-        font=font_lg,
-        fill=hex_to_rgb(palette["on_accent"]),
+        (canvas[0] + 12, canvas[3] + 8),
+        "33%    Scale to Window          No source selected",
+        font=font_sm,
+        fill=hex_to_rgb(palette["text_muted"]),
     )
 
-    mixer_top = content_bottom + 10
-    mixer = (margin_x + 12, mixer_top, w - margin_x - 12, h - margin_y - 12)
-    draw_round_rect(draw, mixer, palette["grey6"], radius=10)
-    draw.text((mixer[0] + 14, mixer[1] + 10), "Audio Mixer", font=font_md, fill=hex_to_rgb(palette["text"]))
+    # Bottom docks: Audio Mixer | Transitions | Controls
+    dock_top = body_bottom
+    mixer_w = int((x1 - x0 - 12) * 0.50)
+    trans_w = int((x1 - x0 - 12) * 0.18)
+    mixer = (x0 + 4, dock_top + 4, x0 + 4 + mixer_w, y1 - status_h - 4)
+    transitions = (mixer[2] + 4, dock_top + 4, mixer[2] + 4 + trans_w, y1 - status_h - 4)
+    controls = (transitions[2] + 4, dock_top + 4, x1 - 4, y1 - status_h - 4)
 
+    draw.rectangle(mixer, fill=hex_to_rgb(palette["grey6"]))
+    draw.rectangle(transitions, fill=hex_to_rgb(palette["grey6"]))
+    draw.rectangle(controls, fill=hex_to_rgb(palette["grey6"]))
+
+    draw.text((mixer[0] + 10, mixer[1] + 8), "Audio Mixer", font=font_md, fill=hex_to_rgb(palette["text"]))
     meters = [
-        ("Desktop", palette["green"], 0.82),
-        ("Mic/Aux", palette["primary"], 0.55),
-        ("Music", palette["yellow"], 0.35),
+        ("Desktop", palette["green"], 0.15),
+        ("Mic/Aux", palette["yellow"], 0.08),
+        ("Chat", palette["green"], 0.22),
+        ("Game", palette["primary"], 0.18),
     ]
-    mx = mixer[0] + 24
-    meter_bottom = mixer[3] - 14
-    meter_top = mixer[1] + 42
-    meter_w = max(140, (mixer[2] - mixer[0] - 70) // len(meters) - 20)
+    mw = max(36, (mixer[2] - mixer[0] - 24) // len(meters) - 10)
+    mx = mixer[0] + 14
+    bar_top = mixer[1] + 40
+    bar_bot = mixer[3] - 28
     for label, color, level in meters:
-        draw.text((mx, meter_top - 4), label, font=font_sm, fill=hex_to_rgb(palette["text_muted"]))
-        bar = (mx, meter_top + 18, mx + meter_w, meter_bottom)
-        draw_round_rect(draw, bar, palette["grey8"], radius=6)
-        height = max(10, int((bar[3] - bar[1] - 6) * level))
-        filled_top = bar[3] - 3 - height
-        draw.rectangle((bar[0] + 3, filled_top, bar[2] - 3, bar[3] - 3), fill=hex_to_rgb(color))
-        draw.rectangle(
-            (bar[0] + 3, filled_top, bar[2] - 3, filled_top + 4),
-            fill=hex_to_rgb(palette["primary_lighter"]),
+        draw.text((mx, bar_top - 18), label[:7], font=font_sm, fill=hex_to_rgb(palette["text_muted"]))
+        bar = (mx + 8, bar_top, mx + 8 + 18, bar_bot)
+        draw.rectangle(bar, fill=hex_to_rgb(palette["grey8"]))
+        fill_h = max(4, int((bar[3] - bar[1]) * level))
+        draw.rectangle((bar[0], bar[3] - fill_h, bar[2], bar[3]), fill=hex_to_rgb(color))
+        mx += mw
+
+    draw.text((transitions[0] + 10, transitions[1] + 8), "Scene Transitions", font=font_sm, fill=hex_to_rgb(palette["text"]))
+    draw_round_rect(
+        draw,
+        (transitions[0] + 10, transitions[1] + 36, transitions[2] - 10, transitions[1] + 64),
+        palette["grey5"],
+        radius=4,
+    )
+    draw.text((transitions[0] + 18, transitions[1] + 42), "Fade", font=font_sm, fill=hex_to_rgb(palette["text"]))
+    draw.text((transitions[0] + 10, transitions[1] + 78), "300 ms", font=font_sm, fill=hex_to_rgb(palette["text_muted"]))
+
+    # Controls — stacked like real OBS (Streaming often red-tinted in Yami)
+    btns = [
+        ("Start Streaming", palette["button_bg_red"], palette["on_red"]),
+        ("Start Recording", palette["grey5"], palette["text"]),
+        ("Studio Mode", palette["grey5"], palette["text"]),
+        ("Settings", palette["grey5"], palette["text"]),
+    ]
+    by = controls[1] + 10
+    for label, fill, ink in btns:
+        box = (controls[0] + 10, by, controls[2] - 10, by + 34)
+        draw_round_rect(draw, box, fill, radius=6)
+        tw = draw.textlength(label, font=font_btn)
+        draw.text(
+            (int((box[0] + box[2] - tw) / 2), by + 8),
+            label,
+            font=font_btn,
+            fill=hex_to_rgb(ink),
         )
-        mx += meter_w + 24
+        by += 42
+
+    # Status bar
+    draw.rectangle((x0, y1 - status_h, x1, y1), fill=hex_to_rgb(palette["grey7"]))
+    draw.text(
+        (x0 + 12, y1 - status_h + 5),
+        "CPU 0.4%    60.00 fps",
+        font=font_sm,
+        fill=hex_to_rgb(palette["text_muted"]),
+    )
 
     dest.parent.mkdir(parents=True, exist_ok=True)
     img.save(dest, format="PNG", optimize=True)
