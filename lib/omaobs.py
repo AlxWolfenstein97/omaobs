@@ -703,7 +703,7 @@ SAFE_Y = 48
 
 
 def render_mockup(palette: dict[str, Any], dest: Path, size: tuple[int, int] = MOCKUP_SIZE) -> Path:
-    """OBS Studio chrome from a real Asphalt/OmaOBS window capture.
+    """OBS Studio chrome from a real Hackerman/OmaOBS window capture.
 
     Dock layout matches current OBS (Scenes+Sources left, preview center,
     mixer + transitions + controls along the bottom). Colours from

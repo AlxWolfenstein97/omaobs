@@ -3,7 +3,7 @@
 **Omarchy themes your desktop. OmaOBS carries the same palette into OBS Studio —
 mockup previews in the Style menu, then a real Yami variant OBS can load.**
 
-![OmaOBS on Asphalt Legends — live OBS Studio wearing the Omarchy palette](preview.png)
+![OmaOBS on Hackerman — live OBS Studio wearing the Omarchy palette](preview.png)
 
 Stock Omarchy paints Hyprland, the terminal, and your GTK apps. OBS keeps its
 own skin. Your desktop wears Hackerman neon; the encoder wears default grey.
@@ -66,7 +66,7 @@ from every `colors.toml`.
 
 **How it was done**
 
-1. Apply OmaOBS on **Asphalt Legends**, open OBS (Display Capture parked so the
+1. Apply OmaOBS on official **Hackerman**, open OBS (Display Capture parked so the
    preview stays empty and readable).
 2. Capture the window (OMCP + grim) — Scenes/Sources left, black preview,
    Audio Mixer + Scene Transitions + Controls along the bottom.
@@ -75,9 +75,9 @@ from every `colors.toml`.
 
 **Compare — live OmaOBS window vs generated mockup (same theme):**
 
-| Real OBS (Asphalt Legends / OmaOBS) | OmaOBS mockup (Asphalt Legends) |
+| Real OBS (Hackerman / OmaOBS) | OmaOBS mockup (Hackerman) |
 | --- | --- |
-| ![Live OBS on Asphalt Legends — reference](reference-obs-asphalt.png) | ![Generated OmaOBS mockup — same docks, drawn from colors.toml](preview-mockup.png) |
+| ![Live OBS on Hackerman — reference](reference-obs-hackerman.png) | ![Generated OmaOBS mockup — same docks, drawn from colors.toml](preview-mockup.png) |
 
 Hero above is the live capture. Picker tiles are the drawn mockups.
 
@@ -149,8 +149,8 @@ bash ~/.config/omarchy/plugins/io.github.alxwolfenstein97.omaobs/check.sh
 
 ## Credits
 
-- **Layout reference:** [`reference-obs-asphalt.png`](reference-obs-asphalt.png)
-  — live OBS on **Asphalt Legends** via OmaOBS (Display Capture removed for a
+- **Layout reference:** [`reference-obs-hackerman.png`](reference-obs-hackerman.png)
+  — live OBS on official **Hackerman** via OmaOBS (Display Capture removed for a
   clean preview). Captured with [OMCP](https://github.com/btsouth/omarchy-omcp)
   + grim. Compare to [`preview-mockup.png`](preview-mockup.png).
 - Sibling Style plugins: [OmaBoot](https://github.com/AlxWolfenstein97/omaboot),
