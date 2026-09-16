@@ -52,23 +52,44 @@ install -m 755 "$here/omarchy/theme-set-hook" "$hooks/omaobs"
 note "hook: $hooks/omaobs"
 
 # ------------------------------------------------------------------------ menu
-"$here/bin/omaobs" install-menu
-# Shell service re-runs install --quiet on every boot — skip menu/shell
-# rescans there (they stack across plugins and feel like a Hypr "zoom stroke").
+# Style extenders all rewrite the same extensions file. Shell-service --quiet
+# starts them in parallel — flock so we don't clobber each other's rows, then
+# refresh the live menu only when the file actually changed (avoids stacked
+# Hypr "zoom strokes" on every boot).
+menu_lock="$HOME/.local/state/omarchy/style-extenders/menu.lock"
+menu_sha="$HOME/.local/state/omarchy/style-extenders/menu.sha"
+menu_file="$HOME/.config/omarchy/extensions/omarchy-menu.jsonc"
+mkdir -p "$(dirname "$menu_lock")"
+(
+  flock 9
+  "$here/bin/omaobs" install-menu
+  if command -v omarchy-shell >/dev/null 2>&1 && [[ -f $menu_file ]]; then
+    new_sha=$(sha256sum "$menu_file" 2>/dev/null | awk '{print $1}')
+    old_sha=$(cat "$menu_sha" 2>/dev/null || true)
+    if [[ -n $new_sha && $new_sha != "$old_sha" ]]; then
+      omarchy-shell -q omarchy.menu refresh >/dev/null 2>&1 || true
+      printf '%s\n' "$new_sha" >"$menu_sha"
+    fi
+  fi
+) 9>"$menu_lock"
 if (( ! quiet )); then
-  omarchy-shell -q omarchy.menu refresh >/dev/null 2>&1 || true
   omarchy-shell -q shell rescanPlugins >/dev/null 2>&1 || true
 fi
 
 # ----------------------------------------------------------- initial apply/sync
-if (( ! quiet )); then
-  if command -v omarchy >/dev/null 2>&1; then
-    "$here/bin/omaobs-sync" --quiet >/dev/null 2>&1 \
-      && note "synced OBS theme to current Omarchy palette" \
-      || warn "initial sync skipped (no current theme yet?)"
-  else
-    warn "omarchy not on PATH; run 'omaobs sync' after your next theme set"
+# Interactive always syncs. Quiet: one-shot if we have never synced on this
+# machine (fresh plugin add), then the theme-set hook keeps OBS in step.
+if command -v omarchy >/dev/null 2>&1; then
+  if (( ! quiet )) || [[ ! -f $state/synced ]]; then
+    if "$here/bin/omaobs-sync" --quiet >/dev/null 2>&1; then
+      touch "$state/synced"
+      note "synced OBS theme to current Omarchy palette"
+    else
+      warn "initial sync skipped (no current theme yet?)"
+    fi
   fi
+else
+  warn "omarchy not on PATH; run 'omaobs sync' after your next theme set"
 fi
 
 # Warm mockups once on interactive install — not on every shell-start --quiet.
