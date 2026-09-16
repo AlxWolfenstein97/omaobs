@@ -135,8 +135,9 @@ omarchy plugin disable io.github.alxwolfenstein97.omaobs
 omarchy plugin remove io.github.alxwolfenstein97.omaobs
 ```
 
-Uninstall removes the menu row, theme-set hook, generated `Omarchy.ovt`, and
-OmaOBS state/cache. Scene collections are untouched.
+Uninstall is a clean slate: menu row, theme-set hook, generated `Omarchy.ovt`,
+`Appearance.Theme` when it still points at OmaOBS, and state/cache. Scene
+collections are untouched.
 
 ## Limits, honestly
 

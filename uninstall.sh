@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 #
-# Remove OmaOBS wiring. Leaves OBS itself and your scene collections alone.
+# Full clean-slate: menu, theme-set hook, Omarchy.ovt, Appearance.Theme if we
+# set it, cache/state. Leaves OBS itself and your scenes alone.
 #
 set -euo pipefail
 
@@ -23,7 +24,7 @@ if [[ -f $ovt ]]; then
   note "removed $ovt"
 fi
 
-# Drop Theme=omaobs from user.ini if we set it (best-effort; leave AutoReload).
+# Drop Theme= when it still points at OmaOBS (THEME_ID).
 ini="$HOME/.config/obs-studio/user.ini"
 if [[ -f $ini ]] && grep -q 'io.github.alxwolfenstein97.omaobs' "$ini"; then
   python3 - <<'PY'
@@ -33,11 +34,16 @@ path = Path.home() / ".config/obs-studio/user.ini"
 p = ConfigParser(interpolation=None)
 p.optionxform = str
 p.read(path)
-if p.has_section("Appearance") and p.get("Appearance", "Theme", fallback="") == "io.github.alxwolfenstein97.omaobs":
-    p.remove_option("Appearance", "Theme")
+changed = False
+if p.has_section("Appearance"):
+    if p.get("Appearance", "Theme", fallback="") == "io.github.alxwolfenstein97.omaobs":
+        p.remove_option("Appearance", "Theme")
+        changed = True
+    # AutoReload was set by us; leave it — harmless OBS default-ish behaviour.
+if changed:
     with path.open("w", encoding="utf-8") as fh:
         p.write(fh, space_around_delimiters=False)
-print("cleared Appearance.Theme")
+    print("cleared Appearance.Theme")
 PY
 fi
 
@@ -50,6 +56,6 @@ if command -v omarchy >/dev/null 2>&1; then
   omarchy plugin disable "$plugin_id" >/dev/null 2>&1 || true
 fi
 
-note "done — plugin files left at $here; remove the folder yourself if you want it gone"
-note "pick a stock theme under OBS Settings > Appearance if needed"
+note "done — no omaobs menu/hook/Omarchy.ovt left; pick a stock OBS theme if needed"
+note "plugin files remain at $here until you omit/remove the plugin"
 exit 0
