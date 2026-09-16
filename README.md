@@ -139,6 +139,12 @@ Uninstall is a clean slate: menu row, theme-set hook, generated `Omarchy.ovt`,
 `Appearance.Theme` when it still points at OmaOBS, and state/cache. Scene
 collections are untouched.
 
+Shared packages stay installed. Optional wipe:
+
+```sh
+omarchy pkg drop python-pillow   # only if nothing else needs Pillow
+```
+
 ## Limits, honestly
 
 - OBS only hot-reloads the *current* theme file. Switching *to* Omarchy for the
