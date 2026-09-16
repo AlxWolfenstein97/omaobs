@@ -127,22 +127,18 @@ omaobs sync                 # apply current desktop theme
 omaobs current
 ```
 
-## Remove
+## Disable vs remove
+
+| Action | What happens |
+|--------|----------------|
+| `omarchy plugin disable …` | Shell service stops. **Theme-set hook still runs** — OBS keeps getting `Omarchy.ovt` on every desktop theme flip. |
+| `./uninstall.sh` then disable / remove | Menu, hook, `Omarchy.ovt`, our `Appearance.Theme` key, state/cache gone. Scenes untouched. Shared packages stay. |
+| `omarchy pkg drop python-pillow` | Optional. Only if nothing else on the machine needs Pillow. |
 
 ```sh
 ~/.config/omarchy/plugins/io.github.alxwolfenstein97.omaobs/uninstall.sh
 omarchy plugin disable io.github.alxwolfenstein97.omaobs
 omarchy plugin remove io.github.alxwolfenstein97.omaobs
-```
-
-Uninstall is a clean slate: menu row, theme-set hook, generated `Omarchy.ovt`,
-`Appearance.Theme` when it still points at OmaOBS, and state/cache. Scene
-collections are untouched.
-
-Shared packages stay installed. Optional wipe:
-
-```sh
-omarchy pkg drop python-pillow   # only if nothing else needs Pillow
 ```
 
 ## Limits, honestly
