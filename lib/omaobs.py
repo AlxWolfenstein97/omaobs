@@ -702,6 +702,44 @@ def draw_round_rect(
 MOCKUP_SIZE = (1536, 864)
 SAFE_X = 120
 SAFE_Y = 48
+# Bump when render_mockup chrome changes so cached tiles re-draw.
+MOCKUP_LAYOUT_VERSION = "2"
+
+
+def _input_token(path: Path | None) -> str:
+    if path is None:
+        return "none"
+    try:
+        st = path.stat()
+    except OSError:
+        return "missing"
+    return f"{st.st_mtime_ns}:{st.st_size}"
+
+
+def _preview_meta_path(dest: Path) -> Path:
+    return Path(str(dest) + ".meta")
+
+
+def _preview_fresh(dest: Path, fingerprint: str) -> bool:
+    if not dest.is_file():
+        return False
+    try:
+        return _preview_meta_path(dest).read_text(encoding="utf-8").strip() == fingerprint
+    except OSError:
+        return False
+
+
+def _write_preview_meta(dest: Path, fingerprint: str) -> None:
+    try:
+        _preview_meta_path(dest).write_text(fingerprint + "\n", encoding="utf-8")
+    except OSError:
+        pass
+
+
+def _preview_fingerprint(slug: str) -> str:
+    directory = theme_dir(slug)
+    colors = (directory / "colors.toml") if directory else None
+    return f"layout:{MOCKUP_LAYOUT_VERSION}|colors:{_input_token(colors)}"
 
 
 def render_mockup(palette: dict[str, Any], dest: Path, size: tuple[int, int] = MOCKUP_SIZE) -> Path:
@@ -857,9 +895,15 @@ def preview_path(slug: str) -> Path:
     return paths()["cache"] / "previews" / f"{slugify(slug)}.png"
 
 
-def generate_preview(slug: str) -> Path:
+def generate_preview(slug: str, *, force: bool = False) -> Path:
+    dest = preview_path(slug)
+    fp = _preview_fingerprint(slug)
+    if not force and _preview_fresh(dest, fp):
+        return dest
     palette = palette_from_theme(slug)
-    return render_mockup(palette, preview_path(slug))
+    render_mockup(palette, dest)
+    _write_preview_meta(dest, fp)
+    return dest
 
 
 def bust_image_picker_cache(preview_root: Path) -> None:
@@ -930,17 +974,24 @@ def generate_all_previews() -> list[Path]:
     out: list[Path] = []
     preview_root = paths()["cache"] / "previews"
     preview_root.mkdir(parents=True, exist_ok=True)
-    # Drop stale previews for removed themes.
     wanted = sorted(set(list_theme_slugs()))
+    wanted_set = set(wanted)
     for existing in preview_root.glob("*.png"):
-        if existing.stem not in set(wanted):
+        if existing.stem not in wanted_set:
             existing.unlink(missing_ok=True)
-    if not wanted:
-        bust_image_picker_cache(preview_root)
+            _preview_meta_path(existing).unlink(missing_ok=True)
+    dirty = [
+        slug
+        for slug in wanted
+        if not _preview_fresh(preview_path(slug), _preview_fingerprint(slug))
+    ]
+    if not dirty:
         return out
-    workers = max(1, min(len(wanted), os.cpu_count() or 2))
+    workers = max(1, min(len(dirty), os.cpu_count() or 2))
     with _preview_pool(workers) as pool:
-        futures = {pool.submit(generate_preview, slug): slug for slug in wanted}
+        futures = {
+            pool.submit(generate_preview, slug, force=True): slug for slug in dirty
+        }
         for fut in as_completed(futures):
             slug = futures[fut]
             try:

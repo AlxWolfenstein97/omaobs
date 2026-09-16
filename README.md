@@ -28,7 +28,7 @@ marketplace notes live in [Chroma](https://github.com/AlxWolfenstein97/chroma).
 | Extreme compatibility | Stock + user + foreign themes all appear in the picker automatically. |
 | True Theme Vibe | Dock layout tracked from a live OmaOBS window; recoloured per theme. **Not** grim’ing OBS twenty times. |
 | Carousel-safe | Mockups are 1536×864 with ~8% side inset so the 768×475 tile crop does not shave the chrome. |
-| Snappy pickers | Mockups warm in parallel across CPU cores — opens like Omarchy’s stock art carousels. |
+| Snappy pickers | Mockups warm in parallel across CPU cores and **skip tiles whose `colors.toml` (and layout version) haven’t changed** — reopen is near-instant. |
 
 The applied `Omarchy.ovt` *is* real Yami. Only the picker art is drawn — same
 True Theme Vibe idea as [OmaBoot](https://github.com/AlxWolfenstein97/omaboot) /
