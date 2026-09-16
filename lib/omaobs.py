@@ -9,11 +9,13 @@ from __future__ import annotations
 
 import argparse
 import configparser
+import multiprocessing as mp
 import os
 import re
 import subprocess
 import sys
 import tempfile
+from concurrent.futures import ProcessPoolExecutor, as_completed
 from pathlib import Path
 from typing import Any
 
@@ -914,17 +916,37 @@ def bust_image_picker_cache(preview_root: Path) -> None:
             pass
 
 
+def _preview_pool(workers: int) -> ProcessPoolExecutor:
+    # See omacursor: force fork so bin/* → python3 lib/*.py workers do not
+    # re-import __main__ under Python 3.14's forkserver default.
+    try:
+        ctx = mp.get_context("fork")
+    except ValueError:
+        ctx = mp.get_context()
+    return ProcessPoolExecutor(max_workers=workers, mp_context=ctx)
+
+
 def generate_all_previews() -> list[Path]:
     out: list[Path] = []
     preview_root = paths()["cache"] / "previews"
     preview_root.mkdir(parents=True, exist_ok=True)
     # Drop stale previews for removed themes.
-    wanted = set(list_theme_slugs())
+    wanted = sorted(set(list_theme_slugs()))
     for existing in preview_root.glob("*.png"):
-        if existing.stem not in wanted:
+        if existing.stem not in set(wanted):
             existing.unlink(missing_ok=True)
-    for slug in sorted(wanted):
-        out.append(generate_preview(slug))
+    if not wanted:
+        bust_image_picker_cache(preview_root)
+        return out
+    workers = max(1, min(len(wanted), os.cpu_count() or 2))
+    with _preview_pool(workers) as pool:
+        futures = {pool.submit(generate_preview, slug): slug for slug in wanted}
+        for fut in as_completed(futures):
+            slug = futures[fut]
+            try:
+                out.append(fut.result())
+            except Exception as error:  # noqa: BLE001
+                note(f"preview {slug}: {error}")
     bust_image_picker_cache(preview_root)
     return out
 
