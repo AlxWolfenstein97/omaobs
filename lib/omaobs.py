@@ -1146,6 +1146,54 @@ def menu_action() -> str:
     )
 
 
+STYLE_EXTENDER_BLOCKS = (
+    "omacursor",
+    "omaobs",
+    "omaboot",
+    "omavt",
+    "omatty",
+)
+
+
+def normalize_style_extender_menu_order(menu_path: Path) -> None:
+    """Keep Style extender rows in a stable file order.
+
+    Each plugin's install-menu inserts at the top of the extensions object, so
+    whichever service warms last wins the first slot and the Style submenu
+    shuffles. Extract known blocks and rewrite them in a fixed sequence.
+    """
+    if not menu_path.is_file():
+        return
+    text = menu_path.read_text(encoding="utf-8")
+    found: dict[str, str] = {}
+    for name in STYLE_EXTENDER_BLOCKS:
+        start, end = f"  // {name}:start", f"  // {name}:end"
+        pattern = re.compile(re.escape(start) + r".*?" + re.escape(end), re.S)
+        match = pattern.search(text)
+        if not match:
+            continue
+        found[name] = match.group(0).strip("\n")
+        text = pattern.sub("", text)
+    if not found:
+        return
+    text = re.sub(r"\n{3,}", "\n\n", text)
+    blocks = "\n\n".join(found[name] for name in STYLE_EXTENDER_BLOCKS if name in found)
+    idx = text.rfind("}")
+    if idx < 0:
+        return
+    head, tail = text[:idx].rstrip(), text[idx:]
+    if head and not head.endswith("\n"):
+        head += "\n"
+    new = head + "\n" + blocks + "\n" + tail
+    if not new.endswith("\n"):
+        new += "\n"
+    try:
+        old = menu_path.read_text(encoding="utf-8")
+    except OSError:
+        old = ""
+    if new != old:
+        atomic_write(menu_path, new)
+
 def install_menu_entry() -> None:
     path = paths()["menu"]
     content = path.read_text(encoding="utf-8") if path.is_file() else "{\n}\n"
@@ -1172,6 +1220,9 @@ def install_menu_entry() -> None:
     body.append(MENU_END)
     insertion = "\n".join(body) + "\n"
     atomic_write(path, content[: brace + 1] + "\n" + insertion + content[brace + 1 :])
+
+
+    normalize_style_extender_menu_order(path)
 
 
 def uninstall_menu_entry() -> None:
