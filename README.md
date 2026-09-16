@@ -28,7 +28,7 @@ marketplace notes live in [Chroma](https://github.com/AlxWolfenstein97/chroma).
 | Extreme compatibility | Stock + user + foreign themes all appear in the picker automatically. |
 | True Theme Vibe | Dock layout tracked from a live OmaOBS window; recoloured per theme. **Not** grim’ing OBS twenty times. |
 | Carousel-safe | Mockups are 1536×864 with ~8% side inset so the 768×475 tile crop does not shave the chrome. |
-| Slow pickers are OK | Warming every theme PNG takes a moment; that is the cost of generating previews instead of bundling assets. |
+| Snappy pickers | Mockups warm in parallel across CPU cores — opens like Omarchy’s stock art carousels. |
 
 The applied `Omarchy.ovt` *is* real Yami. Only the picker art is drawn — same
 True Theme Vibe idea as [OmaBoot](https://github.com/AlxWolfenstein97/omaboot) /
@@ -93,8 +93,14 @@ Or from a checkout:
 omarchy plugin enable io.github.alxwolfenstein97.omaobs
 ```
 
-**Needs:** OBS Studio 30.2+ (composable Yami themes), Omarchy’s image picker,
-Python 3 with Pillow (`python-pillow` on Arch).
+**Needs (installer pulls these if missing):**
+
+| Package | Why |
+|---------|-----|
+| `python-pillow` | Draws the Style → OBS Themes mockup PNGs. Without it the carousel is empty on first open. |
+
+Also needs OBS Studio 30.2+ (composable Yami themes) and Omarchy’s image picker.
+`install.sh` installs Pillow **before** warming mockups.
 
 ## How it works
 

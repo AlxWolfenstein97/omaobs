@@ -30,6 +30,23 @@ chmod 755 "$here"/bin/* "$here/omarchy/theme-set-hook" "$here/check.sh" \
 
 export OMAOBS_PLUGIN_DIR="$here"
 
+ensure_pkg() {
+  local pkg=$1
+  local why=$2
+  if pacman -Q "$pkg" &>/dev/null; then
+    return 0
+  fi
+  note "installing $pkg — $why"
+  if command -v omarchy >/dev/null 2>&1; then
+    omarchy pkg add "$pkg" || warn "could not install $pkg"
+  else
+    warn "install $pkg manually — $why"
+  fi
+}
+
+# Pillow draws Style carousel mockups — install before warming previews.
+ensure_pkg python-pillow "draws Style → OBS Themes mockups (Pillow)"
+
 # ------------------------------------------------------------------- theme hook
 install -m 755 "$here/omarchy/theme-set-hook" "$hooks/omaobs"
 note "hook: $hooks/omaobs"
