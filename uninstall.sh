@@ -58,6 +58,7 @@ touch "$state/uninstalled"
 note "cleared state/cache (tombstone left so quiet install cannot resurrect)"
 
 omarchy-shell -q omarchy.menu refresh >/dev/null 2>&1 || true
+omarchy-shell -q shell rescanPlugins >/dev/null 2>&1 || true
 
 if command -v omarchy >/dev/null 2>&1; then
   omarchy plugin disable "$plugin_id" >/dev/null 2>&1 || true

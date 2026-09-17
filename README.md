@@ -132,11 +132,11 @@ omaobs current
 | Action | What happens |
 |--------|----------------|
 | `omarchy plugin disable …` | Shell service stops. **Theme-set hook still runs** — OBS keeps getting `Omarchy.ovt` on every desktop theme flip. |
-| `./uninstall.sh` then disable / remove | Menu, hook, `Omarchy.ovt`, our `Appearance.Theme` key, state/cache gone. Scenes untouched. Shared packages stay. Leaves a state tombstone so Service `--quiet` cannot resurrect the menu. |
+| `./uninstall.sh` then disable / remove | Menu, hook, `Omarchy.ovt`, our `Appearance.Theme` key, state/cache gone. Scenes untouched. Shared packages stay. Leaves a state tombstone so Service `--quiet` cannot resurrect the menu. Refresh + `rescanPlugins` so the shell drops the row (avoids stale OBS Themes after uninstall). |
 | `omarchy pkg drop python-pillow` | Optional. Only if nothing else on the machine needs Pillow. |
 
-Quiet Service install no longer re-pulls Pillow or opens floating sudo (deps are
-interactive-only), and skips shell menu refresh/rescan to avoid boot “strokes”.
+Quiet Service install: one-shot package prompt, theme-set hook kept, menu written
+only if `// omaobs:start` markers are missing (no rewrite every boot).
 
 **Full wipe** — copy-paste to remove plugin wiring *and* the shared package this
 installer may have pulled (skip the `pkg drop` line if something else still
