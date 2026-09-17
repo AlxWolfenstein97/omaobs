@@ -38,8 +38,8 @@ chmod 755 "$here"/bin/* "$here/omarchy/theme-set-hook" "$here/check.sh" \
 
 export OMAOBS_PLUGIN_DIR="$here"
 
-# Packages need sudo. Interactive install can ask in this TTY; Service --quiet
-# must not open floating sudo — deps are interactive-only.
+# Packages need sudo. Interactive install asks in this TTY; Service --quiet
+# opens one floating terminal once (pkgs-prompted) — not again every boot.
 pull_pkgs() {
   local -a missing=()
   local pkg
@@ -84,12 +84,9 @@ pull_pkgs() {
 }
 
 # Pillow draws Style carousel mockups — install before warming previews.
-if (( quiet )); then
-  pacman -Q python-pillow &>/dev/null \
-    || warn "missing python-pillow — re-run install.sh interactively (or: omarchy pkg add python-pillow)"
-else
-  pull_pkgs python-pillow || true
-fi
+# Interactive: ask in this TTY. Quiet/Service: one floating terminal once
+# (pkgs-prompted), never again on later boots if dismissed.
+pull_pkgs python-pillow || true
 
 # ------------------------------------------------------------------- theme hook
 install -m 755 "$here/omarchy/theme-set-hook" "$hooks/omaobs"
