@@ -11,11 +11,16 @@ hooks="$HOME/.config/omarchy/hooks/theme-set.d"
 ovt="$HOME/.config/obs-studio/themes/Omarchy.ovt"
 state="$HOME/.local/state/omarchy/omaobs"
 cache="$HOME/.cache/omarchy/omaobs"
+menu_lock="$HOME/.local/state/omarchy/style-extenders/menu.lock"
 
 note() { printf 'omaobs: %s\n' "$1"; }
 
 export OMAOBS_PLUGIN_DIR="$here"
-"$here/bin/omaobs" uninstall-menu || true
+mkdir -p "$(dirname "$menu_lock")"
+(
+  flock 9
+  "$here/bin/omaobs" uninstall-menu || true
+) 9>"$menu_lock"
 rm -f "$hooks/omaobs"
 note "removed theme-set hook"
 
@@ -48,7 +53,9 @@ PY
 fi
 
 rm -rf "$state" "$cache"
-note "cleared state/cache"
+mkdir -p "$state"
+touch "$state/uninstalled"
+note "cleared state/cache (tombstone left so quiet install cannot resurrect)"
 
 omarchy-shell -q omarchy.menu refresh >/dev/null 2>&1 || true
 
