@@ -29,13 +29,13 @@ offer_pkg_drop() {
   {
     printf '%s\n' '#!/usr/bin/env bash' 'set -uo pipefail'
     printf '%s\n' "printf '%s\n' 'OmaOBS — uninstall'"
+    printf '%s\n' "printf '%s\n' 'io.github.alxwolfenstein97.omaobs'"
+    printf '%s\n' "printf '%s\n' 'Style → OBS Themes — OBS mockups + Omarchy.ovt'"
     printf '%s\n' "printf '%s\n' '────────────────────────────────'"
-    printf '%s\n' "printf '%s\n' 'Optional — drop shared packages only if nothing else needs them:'"
+    printf '%s\n' "printf '%s\n' 'Optional — packages OmaOBS may have pulled (only if nothing else needs them):'"
     for pkg in "${have[@]}"; do
       case $pkg in
-        python-pillow) printf '%s\n' "printf '  • %s — %s\n' 'python-pillow' 'Style carousel mockups'" ;;
-        python-numpy) printf '%s\n' "printf '  • %s — %s\n' 'python-numpy' 'Adwaita cursor remaps'" ;;
-        adw-gtk-theme) printf '%s\n' "printf '  • %s — %s\n' 'adw-gtk-theme' 'GTK theme Chroma paints'" ;;
+        python-pillow) printf '%s\n' "printf '  • %s — %s\n' 'python-pillow' 'was used to draw OBS Themes carousel mockups'" ;;
         *) printf '%s\n' "printf '  • %s\n' $(printf %q "$pkg")" ;;
       esac
     done
@@ -49,12 +49,13 @@ offer_pkg_drop() {
   } >"$script"
   chmod 755 "$script"
   if command -v omarchy-launch-floating-terminal-with-presentation >/dev/null 2>&1; then
-    note "optional package drop — opening floating terminal"
+    note "OmaOBS optional package drop — opening floating terminal"
     omarchy-launch-floating-terminal-with-presentation "bash $(printf %q "$script")" >/dev/null 2>&1 &
   else
     note "optional: omarchy pkg drop $list"
   fi
 }
+
 
 
 export OMAOBS_PLUGIN_DIR="$here"
