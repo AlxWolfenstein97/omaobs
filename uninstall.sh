@@ -24,16 +24,38 @@ offer_pkg_drop() {
   done
   ((${#have[@]})) || return 0
   local list="${have[*]}"
-  local cmd="omarchy pkg drop $list"
+  local script="$state/uninstall-floater.sh"
+  mkdir -p "$state"
+  {
+    printf '%s\n' '#!/usr/bin/env bash' 'set -uo pipefail'
+    printf '%s\n' "printf '%s\n' 'OmaOBS — uninstall'"
+    printf '%s\n' "printf '%s\n' '────────────────────────────────'"
+    printf '%s\n' "printf '%s\n' 'Optional — drop shared packages only if nothing else needs them:'"
+    for pkg in "${have[@]}"; do
+      case $pkg in
+        python-pillow) printf '%s\n' "printf '  • %s — %s\n' 'python-pillow' 'Style carousel mockups'" ;;
+        python-numpy) printf '%s\n' "printf '  • %s — %s\n' 'python-numpy' 'Adwaita cursor remaps'" ;;
+        adw-gtk-theme) printf '%s\n' "printf '  • %s — %s\n' 'adw-gtk-theme' 'GTK theme Chroma paints'" ;;
+        *) printf '%s\n' "printf '  • %s\n' $(printf %q "$pkg")" ;;
+      esac
+    done
+    printf '%s\n' "printf '%s\n' '────────────────────────────────'"
+    printf '%s\n' "printf '%s\n' ''"
+    printf '%s\n' "read -r -p 'Drop ${list}? [y/N] ' a"
+    printf '%s\n' 'case $a in'
+    printf '%s\n' "  [yY]|[yY][eE][sS]) omarchy pkg drop ${list} ;;"
+    printf '%s\n' "  *) printf 'skipped package drop\n' ;;"
+    printf '%s\n' 'esac'
+  } >"$script"
+  chmod 755 "$script"
   if command -v omarchy-launch-floating-terminal-with-presentation >/dev/null 2>&1; then
     note "optional package drop — opening floating terminal"
-    omarchy-launch-floating-terminal-with-presentation \
-      "bash -lc $(printf %q "read -r -p \"Drop $list? [y/N] \" a; case \$a in [yY]|[yY][eE][sS]) $cmd ;; *) echo skipped ;; esac")" \
-      >/dev/null 2>&1 &
+    omarchy-launch-floating-terminal-with-presentation "bash $(printf %q "$script")" >/dev/null 2>&1 &
   else
-    note "optional: $cmd"
+    note "optional: omarchy pkg drop $list"
   fi
 }
+
 
 export OMAOBS_PLUGIN_DIR="$here"
 
