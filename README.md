@@ -132,21 +132,20 @@ omaobs current
 | Action | What happens |
 |--------|----------------|
 | `omarchy plugin disable …` | Shell service stops. **Theme-set hook still runs** — OBS keeps getting `Omarchy.ovt` on every desktop theme flip. |
-| `./uninstall.sh` then disable / remove | Menu, hook, `Omarchy.ovt`, our `Appearance.Theme` key, state/cache gone. Scenes untouched. Shared packages stay. Leaves a state tombstone so Service `--quiet` cannot resurrect the menu. Refresh + `rescanPlugins` so the shell drops the row (avoids stale OBS Themes after uninstall). |
-| `omarchy pkg drop python-pillow` | Optional. Only if nothing else on the machine needs Pillow. |
+| `./uninstall.sh` then disable / remove | Menu, hook, `Omarchy.ovt`, our `Appearance.Theme` key, state/cache gone. Scenes untouched. Tombstone + disable **first** so Service quiet cannot resurrect the Style row. Optional floating terminal (y/N) for `pkg drop`. |
+| `omarchy pkg drop python-pillow` | Optional. Only if nothing else needs Pillow. Uninstall may open a floating terminal for this. |
 
 Quiet Service install: one-shot package prompt, theme-set hook kept, menu written
-only if `// omaobs:start` markers are missing (no rewrite every boot).
+only if `// omaobs:start` markers are missing; also scrubs orphan Style rows for
+sibling plugins removed without `uninstall.sh`.
 
-**Full wipe** — copy-paste to remove plugin wiring *and* the shared package this
-installer may have pulled (skip the `pkg drop` line if something else still
+**Full wipe** — wiring + optional package (skip `pkg drop` if something else
 needs Pillow):
 
 ```sh
 ~/.config/omarchy/plugins/io.github.alxwolfenstein97.omaobs/uninstall.sh
-omarchy plugin disable io.github.alxwolfenstein97.omaobs
 omarchy plugin remove io.github.alxwolfenstein97.omaobs
-omarchy pkg drop python-pillow
+# pkg drop offered in a floating terminal; or: omarchy pkg drop python-pillow
 ```
 
 ## Limits, honestly
