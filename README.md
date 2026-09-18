@@ -136,8 +136,9 @@ omaobs current
 | `omarchy pkg drop python-pillow` | Optional. Only if nothing else needs Pillow. Uninstall may open a floating terminal for this. |
 
 Quiet Service install: one-shot package prompt, theme-set hook kept, menu written
-only if `// omaobs:start` markers are missing; also scrubs orphan Style rows for
-sibling plugins removed without `uninstall.sh`.
+only if `// omaobs:start` markers are missing; `omarchy.menu refresh` +
+`shell rescanPlugins` so Style → OBS Themes shows without a manual shell restart;
+also scrubs orphan Style rows for sibling plugins removed without `uninstall.sh`.
 
 **Full wipe** — wiring + optional package (skip `pkg drop` if something else
 needs Pillow):
