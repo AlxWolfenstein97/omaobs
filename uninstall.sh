@@ -106,6 +106,7 @@ mkdir -p "$(dirname "$menu_lock")"
   "$here/bin/omaobs" uninstall-menu || true
 ) 9>"$menu_lock"
 rm -f "$hooks/omaobs"
+rm -f "$state/armed-theme-hook" "$state/armed-style-menu"
 note "removed theme-set hook"
 
 if [[ -f $ovt ]]; then

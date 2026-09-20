@@ -79,6 +79,29 @@ from every `colors.toml`.
 
 Hero above is the live capture. Picker tiles are the drawn mockups.
 
+
+## Marketplace consent (hooks & Style menu)
+
+Installing the plugin only drops the code into your plugins folder. Writing a
+**Style** menu row or a **theme-set** hook edits your Omarchy config, so that
+stays **opt-in** (marketplace rule: no silent config overwrite).
+
+Interactive `./install.sh` asks once (default Yes). Or run later:
+
+```sh
+# Style menu row (plugins that have a Style → … picker)
+./tools/install-style-menu.sh
+
+# Follow `omarchy theme set` automatically (Chroma / OmaCursor / OmaOBS / OmaHud)
+./tools/install-theme-hook.sh
+```
+
+(style-menu + theme-hook)
+
+Paths are under `~/.config/omarchy/plugins/io.github.alxwolfenstein97.omaobs/`.
+Quiet shell restarts only restore what you already armed. `./uninstall.sh`
+clears the arming flags too.
+
 ## Install
 
 ```sh
