@@ -156,5 +156,19 @@ else
 fi
 
 note "done — no omaobs menu/hook/Omarchy.ovt left; pick a stock OBS theme if needed"
-note "plugin files remain at $here until you omit/remove the plugin"
+if (( assume_yes )); then
+  note "full wipe (--yes): removing plugin $plugin_id"
+  if command -v omarchy >/dev/null 2>&1; then
+    # Leave the tree before Omarchy deletes it out from under us.
+    cd "${HOME:-/}" || cd /
+    omarchy plugin remove "$plugin_id" --yes \
+      || note "plugin remove failed — try: omarchy plugin remove $plugin_id --yes"
+  else
+    note "omarchy CLI missing — delete by hand: $here"
+  fi
+else
+  note "plugin files remain at $here until you omit/remove the plugin"
+  note "  omarchy plugin remove $plugin_id"
+fi
+
 exit 0
