@@ -102,13 +102,15 @@ Same for the small helpers: `./tools/install-style-menu.sh --yes` /
 ```
 
 **Full wipe (this plugin)** — same ease as `install.sh --yes`
-(teardown + `plugin remove`; skips optional pkg Y/n; pillow etc. stay):
+(teardown + `plugin remove`; best-effort `pkg drop` for deps this plugin may
+have pulled — kept only when pacman still needs them elsewhere):
 
 ```sh
 ~/.config/omarchy/plugins/io.github.alxwolfenstein97.omaobs/uninstall.sh --yes
 ```
 
-**Wipe the whole family** (calls each plugin’s `uninstall.sh --yes`):
+**Wipe the whole family** (each plugin’s `uninstall.sh --yes`, then a final
+shared-dep sweep — paint / hooks / menus / DRM / SDDM / root extras gone):
 
 ```sh
 ~/.config/omarchy/plugins/io.github.alxwolfenstein97.chroma/tools/wipe-all-family.sh
@@ -192,7 +194,7 @@ missing; `omarchy.menu refresh` + `shell rescanPlugins` so Style → OBS Themes 
 without a manual shell restart; also scrubs orphan Style rows for siblings removed
 without `uninstall.sh`.
 
-**Full wipe** — one shot (`--yes` skips pkg Y/n and removes the plugin):
+**Full wipe** — one shot (`--yes` skips pkg Y/n, best-effort drops deps this plugin may have pulled if nothing else needs them, and removes the plugin):
 
 ```sh
 ~/.config/omarchy/plugins/io.github.alxwolfenstein97.omaobs/uninstall.sh --yes
