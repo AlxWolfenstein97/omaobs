@@ -36,17 +36,13 @@ try_pkg_drop() {
 }
 
 ask_pkg_drop() {
-  # Interactive TTY only — no floating terminal (harder to dismiss mid-cleanup).
+  # Interactive — prompts in this terminal (no floater).
   local -a have=()
   local pkg a req
   for pkg in "$@"; do
     pacman -Q "$pkg" &>/dev/null && have+=("$pkg")
   done
   ((${#have[@]})) || return 0
-  if [[ ! -t 0 && ! -t 1 ]]; then
-    note "no TTY — skip optional pkg drop (re-run from a terminal, or uninstall.sh --yes)"
-    return 0
-  fi
   note "optional package drops — n / Enter keeps; pacman may refuse if still required"
   for pkg in "${have[@]}"; do
     case $pkg in
