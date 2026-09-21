@@ -2,7 +2,7 @@
 #
 # Full clean-slate: menu, theme-set hook, Omarchy.ovt, Appearance.Theme if we
 # set it, cache/state. Leaves OBS itself and your scenes alone. Optional
-# package drop prompts in this TTY (no floater).
+# package drop prompts in this TTY (this TTY).
 #
 set -euo pipefail
 
@@ -36,7 +36,7 @@ try_pkg_drop() {
 }
 
 ask_pkg_drop() {
-  # Interactive — prompts in this terminal (no floater).
+  # Interactive — prompts in this terminal (this TTY).
   local -a have=()
   local pkg a req
   for pkg in "$@"; do
