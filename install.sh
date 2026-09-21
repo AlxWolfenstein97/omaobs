@@ -152,7 +152,8 @@ pull_pkgs() {
   fi
 
   note "OmaOBS needs ${missing[*]} — Style → OBS Themes — OBS mockups + Omarchy.ovt"
-  if (( ! quiet )) && [[ -t 0 || -t 1 ]]; then
+  # --yes / family oneshot: install inline (no floater). Interactive TTY same.
+  if (( assume_yes )) || { (( ! quiet )) && [[ -t 0 || -t 1 ]]; }; then
     printf '%s\n' "OmaOBS"
     printf '%s\n' "io.github.alxwolfenstein97.omaobs"
     printf '%s\n' "Style → OBS Themes — OBS mockups + Omarchy.ovt"
