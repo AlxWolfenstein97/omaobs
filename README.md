@@ -173,10 +173,10 @@ omaobs current
 omarchy plugin add https://github.com/AlxWolfenstein97/omaobs.git --enable
 # Style → OBS Themes appears without a shell restart; carousel tiles warm (needs python-pillow)
 # Pick a loud theme; confirm the surface updates (OBS Appearance theme / mockups; may need OBS already running or a restart once)
-# Skip install floater → logout/reboot → floater returns (shell restart does not re-nag)
-# Parallel Style plugins share one Pillow floater; siblings only ask for their own missing pkgs
-# ./uninstall.sh → reset floater (hook + Omarchy.ovt + Appearance.Theme cleared) + optional itemized pkg drop (Pillow notes Required By)
-# Skip remove floater + disable → reinstall → uninstall again → complete the floater
+# plugin add alone + reboot → still no floater (quiet skips pkgs); run install.sh for deps/hooks
+# Parallel install.sh: shared Pillow flock; siblings only ask for their own missing pkgs
+# ./uninstall.sh → this TTY: hook + Omarchy.ovt + Appearance.Theme cleared + optional pkg drop
+# Skip pkg prompts (n) + disable → reinstall → uninstall again → answer y if you want drops
 # With mangohud/goverlay kept, Pillow drop may fail — fine; clear/uninstall still work without Pillow
 ```
 
@@ -185,8 +185,8 @@ omarchy plugin add https://github.com/AlxWolfenstein97/omaobs.git --enable
 | Action | What happens |
 |--------|----------------|
 | `omarchy plugin disable …` | Shell service stops. **Theme-set hook still runs** — OBS keeps getting `Omarchy.ovt` on every desktop theme flip. |
-| `./uninstall.sh` then disable / remove | Menu, hook, `Omarchy.ovt`, our `Appearance.Theme` key, state/cache gone. Scenes untouched. Tombstone + disable **first** so Service quiet cannot resurrect the Style row. Optional floating terminal (y/N) for `pkg drop`. |
-| `omarchy pkg drop python-pillow` | Optional. Itemized floater shows why + `pacman Required By` (MangoHud etc.). Clear/uninstall still work without Pillow. |
+| `./uninstall.sh` then disable / remove | Menu, hook, `Omarchy.ovt`, our `Appearance.Theme` key, state/cache gone. Scenes untouched. Tombstone + disable **first** so Service quiet cannot resurrect the Style row. Optional TTY y/N for `pkg drop`. |
+| `omarchy pkg drop python-pillow` | Optional. TTY uninstall prompts show why + `pacman Required By` (MangoHud etc.). Clear/uninstall still work without Pillow. |
 
 Quiet Service install (`--quiet`): **no package floaters** — restores already-armed
 wiring only. Deps + Style consent come from interactive `install.sh`, `--yes`, or
