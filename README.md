@@ -188,10 +188,12 @@ omarchy plugin add https://github.com/AlxWolfenstein97/omaobs.git --enable
 | `./uninstall.sh` then disable / remove | Menu, hook, `Omarchy.ovt`, our `Appearance.Theme` key, state/cache gone. Scenes untouched. Tombstone + disable **first** so Service quiet cannot resurrect the Style row. Optional floating terminal (y/N) for `pkg drop`. |
 | `omarchy pkg drop python-pillow` | Optional. Itemized floater shows why + `pacman Required By` (MangoHud etc.). Clear/uninstall still work without Pillow. |
 
-Quiet Service install: one-shot package prompt (shared Pillow flock across Style plugins), theme-set hook kept, menu written
-only if `// omaobs:start` markers are missing; `omarchy.menu refresh` +
-`shell rescanPlugins` so Style → OBS Themes shows without a manual shell restart;
-also scrubs orphan Style rows for sibling plugins removed without `uninstall.sh`.
+Quiet Service install (`--quiet`): **no package floaters** — restores already-armed
+wiring only. Deps + Style consent come from interactive `install.sh`, `--yes`, or
+family `arm-all-family.sh`. Menu written only if `// omaobs:start` markers are
+missing; `omarchy.menu refresh` + `shell rescanPlugins` so Style → OBS Themes shows
+without a manual shell restart; also scrubs orphan Style rows for siblings removed
+without `uninstall.sh`.
 
 **Full wipe** — one shot (`--yes` skips pkg Y/n and removes the plugin):
 
