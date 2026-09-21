@@ -21,6 +21,21 @@ menu_lock="$HOME/.local/state/omarchy/style-extenders/menu.lock"
 
 note() { printf 'omaobs: %s\n' "$1"; }
 
+try_pkg_drop() {
+  # Best-effort: drop packages we may have pulled. If something else still
+  # needs them, pacman refuses and we leave them — that is fine.
+  local pkg
+  for pkg in "$@"; do
+    pacman -Q "$pkg" &>/dev/null || continue
+    if command -v omarchy >/dev/null 2>&1 && omarchy pkg drop "$pkg"; then
+      note "dropped $pkg"
+    else
+      note "kept $pkg (still required elsewhere or drop failed — fine)"
+    fi
+  done
+}
+
+
 offer_pkg_drop() {
   local -a have=()
   local pkg
@@ -152,7 +167,8 @@ omarchy-shell -q shell rescanPlugins >/dev/null 2>&1 || true
 if (( ! assume_yes )); then
   offer_pkg_drop python-pillow
 else
-  note "pkg-drop floater skipped (--yes); packages left installed"
+  note "full wipe (--yes): trying package drops (kept if still required elsewhere)"
+  try_pkg_drop python-pillow
 fi
 
 note "done — no omaobs menu/hook/Omarchy.ovt left; pick a stock OBS theme if needed"
