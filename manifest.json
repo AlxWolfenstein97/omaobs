@@ -5,7 +5,7 @@
   "version": "1.1.2",
   "author": "AlxWolfenstein97",
   "license": "MIT",
-  "description": "Style menu picker with OBS window mockups for every Omarchy theme. Generates a Yami variant OBS can load and applies it after you pick one.",
+  "description": "Style menu OBS Studio themes from colors.toml. Not broken \u2014 read the git README to arm theme hooks + Style menu.",
   "homepage": "https://github.com/AlxWolfenstein97/omaobs",
   "repository": "https://github.com/AlxWolfenstein97/omaobs",
   "kinds": [
