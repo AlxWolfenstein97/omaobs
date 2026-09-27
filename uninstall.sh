@@ -122,6 +122,7 @@ PY
 fi
 
 rm -rf "$cache"
+mapfile -t pkgs_we_pulled < <(grep -v '^[[:space:]]*$' "$state/pkgs-installed" 2>/dev/null || true)
 find "$state" -mindepth 1 ! -name uninstalled -delete 2>/dev/null || true
 touch "$state/uninstalled"
 note "cleared state/cache (tombstone left so quiet install cannot resurrect)"
@@ -130,10 +131,18 @@ omarchy-shell -q omarchy.menu refresh >/dev/null 2>&1 || true
 omarchy-shell -q shell rescanPlugins >/dev/null 2>&1 || true
 
 if (( ! assume_yes )); then
-  ask_pkg_drop python-pillow
+  if ((${#pkgs_we_pulled[@]})); then
+    ask_pkg_drop "${pkgs_we_pulled[@]}"
+  else
+    note "no package ledger — skipping pkg drop (nothing this install recorded pulling)"
+  fi
 else
-  note "full wipe (--yes): trying package drops (kept if still required elsewhere)"
-  try_pkg_drop python-pillow
+  if ((${#pkgs_we_pulled[@]})); then
+    note "full wipe (--yes): dropping only packages this install recorded pulling"
+    try_pkg_drop "${pkgs_we_pulled[@]}"
+  else
+    note "no package ledger — skipping pkg drop (nothing this install recorded pulling)"
+  fi
 fi
 
 note "done — no omaobs menu/hook/Omarchy.ovt left; pick a stock OBS theme if needed"
