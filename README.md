@@ -116,25 +116,19 @@ drop may fail and stay if something else still requires the package):
 
 ```sh
 ~/.config/omarchy/plugins/io.github.alxwolfenstein97.chroma/tools/wipe-all-family.sh
-# optional virgin bookkeeping: add --purge-tombstones
+# optional OCD: add --purge-tombstones (see Tombstones below)
 ```
 
 ### Tombstones (after wipe)
 
-Each `uninstall.sh` leaves `~/.local/state/omarchy/<plugin>/uninstalled` so a
-**same-session** boom-out → boom-in can reset package-prompt stamps / shared
-Pillow claims and feel like a fresh install. Logout/reboot already clear those
-runtime stamps; long-term the file is harmless bookkeeping. Quiet Service does
-**not** re-arm Style from the tombstone — that needs a loud `install.sh` (or
-`--yes` / family arm).
+Harmless sticky note at `~/.local/state/omarchy/<plugin>/uninstalled`. The next
+install (quiet or loud) uses it to clear same-session `/run` package-prompt
+stamps / shared Pillow claims, then deletes the note. Logout/reboot clears those
+stamps anyway. Style stays off after wipe because armed state is gone — not
+because of the stone. Normal boom-out → loud boom-in (arm-all) does **not** need
+`--purge-tombstones`.
 
-Smash tombstones only for virgin bookkeeping (never coming back / OCD clean):
-
-```sh
-rm -f ~/.local/state/omarchy/{chroma,omacursor,omaobs,omahud,omaboot,omavt,omatty}/uninstalled
-```
-
-Or fold that into the family wipe:
+Optional OCD wipe of the notes themselves:
 
 ```sh
 ~/.config/omarchy/plugins/io.github.alxwolfenstein97.chroma/tools/wipe-all-family.sh --purge-tombstones
@@ -211,7 +205,7 @@ omarchy plugin add https://github.com/AlxWolfenstein97/omaobs.git --enable
 | Action | What happens |
 |--------|----------------|
 | `omarchy plugin disable …` | Shell service stops. **Theme-set hook still runs** — OBS keeps getting `Omarchy.ovt` on every desktop theme flip. |
-| `./uninstall.sh` then disable / remove | Menu, hook, `Omarchy.ovt`, our `Appearance.Theme` key, state/cache gone. Scenes untouched. Tombstone + disable **first** (quiet Service will not re-arm Style without a loud install). Optional TTY y/N for `pkg drop`. |
+| `./uninstall.sh` then disable / remove | Menu, hook, `Omarchy.ovt`, our `Appearance.Theme` key, state/cache gone. Scenes untouched. Quiet Service only restores what was already armed — after wipe that’s nothing until a loud install. Optional TTY y/N for `pkg drop`. |
 | `omarchy pkg drop python-pillow` | Optional — only if this install recorded pulling it; may fail/stay if something else still requires it (MangoHud / Goverlay etc.). TTY shows `pacman Required By`. Clear/uninstall still work without Pillow. |
 
 Quiet Service install (`--quiet`): restores already-armed wiring only. Deps + Style consent come from interactive `install.sh`, `--yes`, or
