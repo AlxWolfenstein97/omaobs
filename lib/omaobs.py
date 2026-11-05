@@ -16,6 +16,7 @@ import subprocess
 import sys
 import tempfile
 from concurrent.futures import ProcessPoolExecutor, as_completed
+from functools import lru_cache
 from pathlib import Path
 from typing import Any
 
@@ -700,6 +701,7 @@ def set_theme(slug: str, *, quiet: bool = False) -> int:
     return 0
 
 
+@lru_cache(maxsize=None)
 def try_font(size: int) -> ImageFont.ImageFont:
     candidates = [
         "/usr/share/fonts/TTF/DejaVuSans.ttf",
@@ -919,7 +921,7 @@ def render_mockup(palette: dict[str, Any], dest: Path, size: tuple[int, int] = M
     )
 
     dest.parent.mkdir(parents=True, exist_ok=True)
-    img.save(dest, format="PNG", optimize=True)
+    img.save(dest, format="PNG", compress_level=3)
     return dest
 
 
@@ -1002,6 +1004,11 @@ def _preview_pool(workers: int) -> ProcessPoolExecutor:
     return ProcessPoolExecutor(max_workers=workers, mp_context=ctx)
 
 
+def _preload_render() -> None:
+    """Import Pillow before forking so every worker inherits it."""
+    Image._load()
+
+
 def generate_all_previews() -> list[Path]:
     out: list[Path] = []
     preview_root = paths()["cache"] / "previews"
@@ -1019,6 +1026,7 @@ def generate_all_previews() -> list[Path]:
     ]
     if not dirty:
         return out
+    _preload_render()
     workers = max(1, min(len(dirty), os.cpu_count() or 2))
     with _preview_pool(workers) as pool:
         futures = {
@@ -1105,6 +1113,10 @@ def cmd_switcher(_: argparse.Namespace) -> int:
 
     cmd = [
         "omarchy-menu-images",
+        # Our tiles are already 1536×864. Let the picker draw them immediately
+        # and warm omarchy-menu-images' JPEG cache in the background instead of
+        # blocking the open on a thumbnail pass.
+        "--lazy-thumbnails",
         "--print-name",
         "--show-labels",
         "--filterable",
