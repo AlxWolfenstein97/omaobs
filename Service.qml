@@ -5,7 +5,7 @@ import Quickshell.Io
 //
 // Theme generation lives in bin/omaobs; the theme-set hook keeps OBS in step
 // with Omarchy. This component only re-runs the installer at shell start so the
-// Style > OBS Themes menu entry and theme-set hook come back after a refresh.
+// Appearance > Extenders > OBS menu entry and theme-set hook come back after a refresh.
 Item {
     id: root
 

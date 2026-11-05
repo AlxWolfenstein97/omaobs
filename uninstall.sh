@@ -47,7 +47,7 @@ ask_pkg_drop() {
   for pkg in "${have[@]}"; do
     case $pkg in
       python-pillow)
-        note "python-pillow — Style carousel mockups (shared); MangoHud/goverlay/Lutris may need it"
+        note "python-pillow — Appearance carousel mockups (shared); MangoHud/goverlay/Lutris may need it"
         req=$(pacman -Qi python-pillow 2>/dev/null | awk -F': ' '/^Required By/{print $2}')
         note "  pacman Required By: ${req:-none}"
         ;;
@@ -78,7 +78,7 @@ ask_pkg_drop() {
 
 export OMAOBS_PLUGIN_DIR="$here"
 
-# Tombstone + disable first so Service --quiet cannot resurrect the Style row.
+# Tombstone + disable first so Service --quiet cannot resurrect the Extender row.
 mkdir -p "$state"
 touch "$state/uninstalled"
 if command -v omarchy >/dev/null 2>&1; then

@@ -1,21 +1,21 @@
 # OmaOBS
 
 **Omarchy themes your desktop. OmaOBS carries the same palette into OBS Studio —
-mockup previews in the Style menu, then a real Yami variant OBS can load.**
+mockup previews in the Appearance menu, then a real Yami variant OBS can load.**
 
 ![OmaOBS on Hackerman — live OBS Studio wearing the Omarchy palette](preview.png)
 
 Stock Omarchy paints Hyprland, the terminal, and your GTK apps. OBS keeps its
 own skin. Your desktop wears Hackerman neon; the encoder wears default grey.
 
-OmaOBS closes that gap the same way Style → Unlock works for Plymouth: a
+OmaOBS closes that gap the same way Appearance → Unlock works for Plymouth: a
 labelled image picker, one mockup per installed theme, and an apply step that
 writes what OBS understands. Pick once, or let `omarchy theme set` keep OBS in
 lockstep forever after.
 
 ## Goals (and honest limits)
 
-These Style plugins extend Omarchy’s theme system **without requiring theme
+These plugins extend Omarchy’s theme system **without requiring theme
 authors — or you — to ship anything extra**. Official themes, your forks, and
 third-party installs all work as long as they have a `colors.toml`. That
 “every theme” contract is intentional: once the desktop can follow farther,
@@ -28,7 +28,7 @@ marketplace notes live in [Chroma](https://github.com/AlxWolfenstein97/chroma).
 | Extreme compatibility | Stock + user + foreign themes all appear in the picker automatically. |
 | True Theme Vibe | Dock layout tracked from a live OmaOBS window; recoloured per theme. **Not** grim’ing OBS twenty times. |
 | Carousel-safe | Mockups are 1536×864 with ~8% side inset so the 768×475 tile crop does not shave the chrome. |
-| Snappy pickers | Mockups warm in parallel across CPU cores and **skip tiles whose `colors.toml` (and layout version) haven’t changed** — reopen is near-instant. On par with Omarchy’s stock Style carousels. |
+| Snappy pickers | Mockups warm in parallel across CPU cores and **skip tiles whose `colors.toml` (and layout version) haven’t changed** — reopen is near-instant. On par with Omarchy’s stock Appearance carousels. |
 
 The applied `Omarchy.ovt` *is* real Yami. Only the picker art is drawn — same
 True Theme Vibe idea as [OmaBoot](https://github.com/AlxWolfenstein97/omaboot) /
@@ -37,14 +37,14 @@ True Theme Vibe idea as [OmaBoot](https://github.com/AlxWolfenstein97/omaboot) /
 ### Why a picker if `theme-set` already syncs?
 
 Chroma can stay silent — it rewrites toolkit CSS for the whole desktop. OBS is
-one specific surface with a real theme format. The Style carousel is still
+one specific surface with a real theme format. The Appearance carousel is still
 worth it: you can skim how OBS would look across **every** installed theme
 faster than applying and eyeballing each one by hand. Pick once (or never —
 the hook keeps pace after that). Same idea as OmaCursor / OmaBoot / OmaVT.
 
 ## What you get
 
-- **Style → OBS Themes** in the Omarchy menu — same carousel picker as Unlock /
+- **Appearance → Extenders → OBS** in the Omarchy menu — same carousel picker as Unlock /
   Theme / Background.
 - **Live theme discovery** — every Omarchy theme with a `colors.toml` under
   `~/.config/omarchy/themes` or `$OMARCHY_PATH/themes`.
@@ -80,9 +80,9 @@ from every `colors.toml`.
 Hero above is the live capture. Picker tiles are the drawn mockups.
 
 
-## Marketplace consent (hooks & Style menu)
+## Marketplace consent (hooks & Appearance menu)
 
-Installing the plugin only drops the code. Style menu rows and theme-set hooks
+Installing the plugin only drops the code. Appearance menu rows and theme-set hooks
 edit your Omarchy config, so they stay **opt-in**.
 
 **Fast path (no prompts)** — from your home folder:
@@ -124,7 +124,7 @@ drop may fail and stay if something else still requires the package):
 Harmless sticky note at `~/.local/state/omarchy/<plugin>/uninstalled`. The next
 install (quiet or loud) uses it to clear same-session `/run` package-prompt
 stamps / shared Pillow claims, then deletes the note. Logout/reboot clears those
-stamps anyway. Style stays off after wipe because armed state is gone — not
+stamps anyway. The menu entry stays off after wipe because armed state is gone — not
 because of the stone. Normal boom-out → loud boom-in (arm-all) does **not** need
 `--purge-tombstones`.
 
@@ -151,7 +151,7 @@ omarchy plugin add https://github.com/AlxWolfenstein97/omaobs.git --enable
 ~/.config/omarchy/plugins/io.github.alxwolfenstein97.omaobs/install.sh
 ```
 
-That clones into `~/.config/omarchy/plugins/io.github.alxwolfenstein97.omaobs` and arms hooks / Style after you
+That clones into `~/.config/omarchy/plugins/io.github.alxwolfenstein97.omaobs` and arms hooks and the Appearance menu after you
 confirm. Skip prompts: `~/.config/omarchy/plugins/io.github.alxwolfenstein97.omaobs/install.sh --yes`.
 
 Or from an existing checkout:
@@ -191,7 +191,7 @@ omaobs current
 
 ```sh
 omarchy plugin add https://github.com/AlxWolfenstein97/omaobs.git --enable
-# Style → OBS Themes appears without a shell restart; carousel tiles warm (needs python-pillow)
+# Appearance → Extenders → OBS appears without a shell restart; carousel tiles warm (needs python-pillow)
 # Pick a loud theme; confirm the surface updates (OBS Appearance theme / mockups; may need OBS already running or a restart once)
 # plugin add alone + reboot → quiet restores wiring only; run install.sh / arm-all for deps/hooks
 # Parallel install.sh: shared Pillow flock; siblings only ask for their own missing pkgs
@@ -208,10 +208,10 @@ omarchy plugin add https://github.com/AlxWolfenstein97/omaobs.git --enable
 | `./uninstall.sh` then disable / remove | Menu, hook, `Omarchy.ovt`, our `Appearance.Theme` key, state/cache gone. Scenes untouched. Quiet Service only restores what was already armed — after wipe that’s nothing until a loud install. Optional TTY y/N for `pkg drop`. |
 | `omarchy pkg drop python-pillow` | Optional — only if this install recorded pulling it; may fail/stay if something else still requires it (MangoHud / Goverlay etc.). TTY shows `pacman Required By`. Clear/uninstall still work without Pillow. |
 
-Quiet Service install (`--quiet`): restores already-armed wiring only. Deps + Style consent come from interactive `install.sh`, `--yes`, or
+Quiet Service install (`--quiet`): restores already-armed wiring only. Deps + menu consent come from interactive `install.sh`, `--yes`, or
 family `arm-all-family.sh`. Menu written only if `// omaobs:start` markers are
-missing; `omarchy.menu refresh` + `shell rescanPlugins` so Style → OBS Themes shows
-without a manual shell restart; also scrubs orphan Style rows for siblings removed
+missing; `omarchy.menu refresh` + `shell rescanPlugins` so Appearance → Extenders → OBS shows
+without a manual shell restart; also scrubs orphan Extender rows for siblings removed
 without `uninstall.sh`.
 
 **Full wipe** — one shot (`--yes` skips pkg Y/n, ledger-only drops of packages this install recorded pulling (may fail and stay if something else still needs them — e.g. Goverlay after Pillow), and removes the plugin):
@@ -239,13 +239,13 @@ bash ~/.config/omarchy/plugins/io.github.alxwolfenstein97.omaobs/check.sh
   — live OBS on official **Hackerman** via OmaOBS (Display Capture removed for a
   clean preview). Captured with [OMCP](https://github.com/btsouth/omarchy-omcp)
   + grim. Compare to [`preview-mockup.png`](preview-mockup.png).
-- Sibling Style plugins: [OmaBoot](https://github.com/AlxWolfenstein97/omaboot),
+- Sibling extenders: [OmaBoot](https://github.com/AlxWolfenstein97/omaboot),
   [OmaVT](https://github.com/AlxWolfenstein97/omavt),
   [OmaTTY](https://github.com/AlxWolfenstein97/omatty),
   [OmaCursor](https://github.com/AlxWolfenstein97/omacursor),
   [OmaHud](https://github.com/AlxWolfenstein97/omahud),
   [Chroma](https://github.com/AlxWolfenstein97/chroma).
-- [Omarchy](https://omarchy.org/) — theme pipeline, Style menu image picker, and
+- [Omarchy](https://omarchy.org/) — theme pipeline, Appearance menu image picker, and
   `theme-set` hooks this plugin hooks into.
 
 ## License
