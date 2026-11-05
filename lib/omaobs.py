@@ -255,7 +255,7 @@ def palette_from_theme(slug: str) -> dict[str, Any]:
         # Yami expects grey7 (bg_window / menubar) darker than grey6 (bg_base /
         # docks). Omarchy's dark_background is the deeper surface — put it on
         # the chrome so the top bar doesn't float as a lighter stripe.
-        greys = {
+        grays = {
             "grey1": lighten(muted, 0.15),
             "grey2": muted,
             "grey3": selection,
@@ -263,12 +263,12 @@ def palette_from_theme(slug: str) -> dict[str, Any]:
             "grey5": lighter_background,
             "grey6": background,
             "grey7": dark_background,
-            "grey8": darker_background,
+            "gray8": darker_background,
         }
         text = foreground
         text_muted = dark_foreground
     else:
-        greys = {
+        grays = {
             "grey1": muted,
             "grey2": lighten(background, 0.02),
             "grey3": lighten(background, 0.04),
@@ -276,7 +276,7 @@ def palette_from_theme(slug: str) -> dict[str, Any]:
             "grey5": mix(background, darker_background, 0.25),
             "grey6": background,
             "grey7": dark_background,
-            "grey8": darker_background,
+            "gray8": darker_background,
         }
         text = foreground
         text_muted = dark_foreground
@@ -336,7 +336,7 @@ def palette_from_theme(slug: str) -> dict[str, Any]:
         "primary_lighter": primary_lighter,
         "primary_dark": primary_dark,
         "primary_darker": primary_darker,
-        **greys,
+        **grays,
         "button_bg_red": darken(red, 0.35) if dark else mix(red, background, 0.55),
         "button_bg_red_hover": darken(red, 0.2) if dark else mix(red, background, 0.4),
         "button_bg_red_down": darken(red, 0.5) if dark else mix(red, background, 0.65),
@@ -368,7 +368,7 @@ def render_ovt(palette: dict[str, Any]) -> str:
     --grey5: {css_rgb(palette['grey5'])};
     --grey6: {css_rgb(palette['grey6'])};
     --grey7: {css_rgb(palette['grey7'])};
-    --grey8: {css_rgb(palette['grey8'])};
+    --gray8: {css_rgb(palette['gray8'])};
 
     --primary: {css_rgb(palette['primary'])};
     --primary_light: {css_rgb(palette['primary_light'])};
@@ -378,7 +378,7 @@ def render_ovt(palette: dict[str, Any]) -> str:
 
     --bg_window: var(--grey7);
     --bg_base: var(--grey6);
-    --bg_preview: var(--grey8);
+    --bg_preview: var(--gray8);
 
     --text: {css_rgb(palette['text'])};
     --text_light: {css_rgb(palette['text'])};
@@ -778,12 +778,12 @@ def render_mockup(palette: dict[str, Any], dest: Path, size: tuple[int, int] = M
     """OBS Studio chrome from a real Hackerman/OmaOBS window capture.
 
     Dock layout matches current OBS (Scenes+Sources left, preview center,
-    mixer + transitions + controls along the bottom). Colours from
-    colors.toml via the Yami grey/primary roles. Not a live grim per theme —
+    mixer + transitions + controls along the bottom). Colors from
+    colors.toml via the Yami gray/primary roles. Not a live grim per theme —
     Limine/TTY-style True Theme Vibe. Content stays inside SAFE_X.
     """
     w, h = size
-    img = Image.new("RGB", size, hex_to_rgb(palette["grey8"]))
+    img = Image.new("RGB", size, hex_to_rgb(palette["gray8"]))
     draw = ImageDraw.Draw(img)
 
     font_sm = try_font(16)
@@ -815,7 +815,7 @@ def render_mockup(palette: dict[str, Any], dest: Path, size: tuple[int, int] = M
 
     draw.rectangle(scenes, fill=hex_to_rgb(palette["grey6"]))
     draw.rectangle(sources, fill=hex_to_rgb(palette["grey6"]))
-    draw.rectangle(preview, fill=hex_to_rgb(palette["grey8"]))
+    draw.rectangle(preview, fill=hex_to_rgb(palette["gray8"]))
 
     # Scenes header + selected row (accent fill like real OBS)
     draw.text((scenes[0] + 10, scenes[1] + 8), "Scenes", font=font_md, fill=hex_to_rgb(palette["text"]))
@@ -874,7 +874,7 @@ def render_mockup(palette: dict[str, Any], dest: Path, size: tuple[int, int] = M
     for label, color, level in meters:
         draw.text((mx, bar_top - 18), label[:7], font=font_sm, fill=hex_to_rgb(palette["text_muted"]))
         bar = (mx + 8, bar_top, mx + 8 + 18, bar_bot)
-        draw.rectangle(bar, fill=hex_to_rgb(palette["grey8"]))
+        draw.rectangle(bar, fill=hex_to_rgb(palette["gray8"]))
         fill_h = max(4, int((bar[3] - bar[1]) * level))
         draw.rectangle((bar[0], bar[3] - fill_h, bar[2], bar[3]), fill=hex_to_rgb(color))
         mx += mw

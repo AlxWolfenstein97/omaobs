@@ -6,7 +6,7 @@ mockup previews in the Appearance menu, then a real Yami variant OBS can load.**
 ![OmaOBS on Hackerman — live OBS Studio wearing the Omarchy palette](preview.png)
 
 Stock Omarchy paints Hyprland, the terminal, and your GTK apps. OBS keeps its
-own skin. Your desktop wears Hackerman neon; the encoder wears default grey.
+own skin. Your desktop wears Hackerman neon; the encoder wears default gray.
 
 OmaOBS closes that gap the same way Appearance → Unlock works for Plymouth: a
 labelled image picker, one mockup per installed theme, and an apply step that
@@ -24,9 +24,9 @@ marketplace notes live in [Chroma](https://github.com/AlxWolfenstein97/chroma).
 
 | Goal | What that means here |
 |------|----------------------|
-| Zero extra assets | No per-theme OBS screenshots in themes. Colours come from `colors.toml` alone. |
+| Zero extra assets | No per-theme OBS screenshots in themes. Colors come from `colors.toml` alone. |
 | Extreme compatibility | Stock + user + foreign themes all appear in the picker automatically. |
-| True Theme Vibe | Dock layout tracked from a live OmaOBS window; recoloured per theme. **Not** grim’ing OBS twenty times. |
+| True Theme Vibe | Dock layout tracked from a live OmaOBS window; recolored per theme. **Not** grim’ing OBS twenty times. |
 | Carousel-safe | Mockups are 1536×864 with ~8% side inset so the 768×475 tile crop does not shave the chrome. |
 | Snappy pickers | Mockups warm in parallel across CPU cores and **skip tiles whose `colors.toml` (and layout version) haven’t changed** — reopen is near-instant. On par with Omarchy’s stock Appearance carousels. |
 
@@ -49,7 +49,7 @@ the hook keeps pace after that). Same idea as OmaCursor / OmaBoot / OmaVT.
 - **Live theme discovery** — every Omarchy theme with a `colors.toml` under
   `~/.config/omarchy/themes` or `$OMARCHY_PATH/themes`.
 - **Mockups** — current OBS dock chrome (Scenes + Sources, empty preview,
-  mixer, Fade transitions, control stack) coloured from that theme’s palette.
+  mixer, Fade transitions, control stack) colored from that theme’s palette.
 - **OBS format** — a Yami variant at
   `~/.config/obs-studio/themes/Omarchy.ovt`.
 - **Apply** — sets `Appearance.Theme` + `AutoReload=true` in `user.ini`, so a
@@ -59,7 +59,7 @@ the hook keeps pace after that). Same idea as OmaCursor / OmaBoot / OmaVT.
 ## Mockups: True Theme Vibe (live OBS as layout base)
 
 OBS has a real theme format, so we do not need per-theme screenshots in theme
-repos. One clean window capture locks the dock silhouette; Pillow recolours it
+repos. One clean window capture locks the dock silhouette; Pillow recolors it
 from every `colors.toml`.
 
 **How it was done**
@@ -69,7 +69,7 @@ from every `colors.toml`.
 2. Capture the window (OMCP + grim) — Scenes/Sources left, black preview,
    Audio Mixer + Scene Transitions + Controls along the bottom.
 3. Trace that chrome in `lib/omaobs.py`, carousel-safe (SAFE_X=120), then
-   recolour from each theme’s Yami grey/primary roles.
+   recolor from each theme’s Yami gray/primary roles.
 
 **Compare — live OmaOBS window vs generated mockup (same theme):**
 
@@ -167,7 +167,7 @@ omarchy plugin enable io.github.alxwolfenstein97.omaobs
 1. `bin/omaobs-switcher` renders PNG mockups into
    `~/.cache/omarchy/omaobs/previews/`, then opens `omarchy-menu-images`.
 2. On selection, `bin/omaobs-set` maps `colors.toml` → Yami `@OBSThemeVars`
-   (greys, primary/accent, text, stream/record reds, meter colours) and writes
+   (grays, primary/accent, text, stream/record reds, meter colors) and writes
    `Omarchy.ovt` with a stable id `io.github.alxwolfenstein97.omaobs`.
 3. `user.ini` gets `Appearance.Theme` + `AutoReload=true`.
 4. `~/.config/omarchy/hooks/theme-set.d/omaobs` runs `omaobs sync` after every
